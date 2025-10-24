@@ -3,8 +3,8 @@ USE CompanyInfo;
 CREATE TABLE IF NOT EXISTS Department
 (
   d_id INT PRIMARY KEY,
-  d_name vaarchar(20) NOT NULL,
-  'function' VARCHAR(20),
+  d_name varchar(20) NOT NULL,
+  `function` VARCHAR(20),
   address VARCHAR(30)
 );
 CREATE TABLE IF NOT EXISTS employee
@@ -46,15 +46,14 @@ SELECT e.* FROM employee e JOIN
 SELECT * FROM employee WHERE age >= 25 AND age <= 30;
 SELECT d_id,COUNT(*) AS emp_count FROM employee GROUP BY d_id;
 SELECT d_id,MAX(salary) AS max_salary FROM employee GROUP BY d_id;
-SELECT d.*,e.* FROM Department d LEFT JOIN empoyee e ON d.d_id = e.d_id;
+SELECT d.*,e.* FROM Department d LEFT JOIN employee e ON d.d_id = e.d_id;
 SELECT d_id ,SUM(salary) AS total_salary FROM employee GROUP BY d_id;
 SELECT * FROM employee ORDER BY salary DESC;  
 SELECT d_id FROM Department UNION SELECT d_id FROM employee;
 SELECT NAME,age,address FROM employee WHERE address LIKE '北京市%';
-selct d_id,
-SUM
-  (CASE WHEN sex = '男' THEN 1 ELSE 0 END) AS male_count,
-  (CASE WHEN sex = '女' THEN 1 ELSE 0 END) AS female_count
+SELECT d_id,
+  SUM(CASE WHEN sex = '男' THEN 1 ELSE 0 END) AS male_count,
+  SUM(CASE WHEN sex = '女' THEN 1 ELSE 0 END) AS female_count
 FROM employee GROUP BY d_id;
 SELECT 
   e.id AS 员工号,
@@ -63,3 +62,4 @@ SELECT
   d.d_name AS 部门名称,
   e.address AS 家庭住址
 FROM employee e JOIN Department d ON e.d_id =d.d_id; 
+SELECT * FROM employee;

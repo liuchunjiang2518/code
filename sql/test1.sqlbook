@@ -1,0 +1,3 @@
+-- SQLBook: Code
+SELECT DATABASE();
+-- SQLBook: Code
