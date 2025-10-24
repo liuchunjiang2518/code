@@ -7,10 +7,10 @@ CREATE TABLE teacherinfo
     name VARCHAR(20) NOT NULL,
     sex ENUM('男','女') NOT NULL DEFAULT '男',
     birthday DATETIME,
-    address VARCHAR(50) COMMENT '家庭住址',
+    address VARCHAR(50) COMMENT '家庭住址'
 )ENGINE=INNODB DEFAULT CHARSET=utf8mb4;
-ALTER TABLE teacherinfo MODIFY 'name' VARCHAR(30) NOT NULL;
-ALTER TABLE teacherinfo MODIFY birthday DATETIME ALTER name;
+ALTER TABLE teacherinfo MODIFY name VARCHAR(30) NOT NULL;
+ALTER TABLE teacherinfo MODIFY birthday DATETIME;
 ALTER TABLE teacherinfo CHANGE num t_id INT NOT NULL UNIQUE;
 ALTER TABLE teacherinfo DROP address;
 ALTER TABLE teacherinfo ADD wages FLOAT;
@@ -18,6 +18,6 @@ ALTER TABLE teacherinfo RENAME TO info;
 SHOW TABLES;
 ALTER TABLE info RENAME TO teacherinfo;
 ALTER TABLE teacherinfo ENGINE=MYISAM;
-ALTER TABLE teacherinfo CHARACTER SET GBK:
+ALTER TABLE teacherinfo CHARACTER SET GBK;
 SHOW CREATE TABLE teacherinfo;
- 
+SECLECT * FROM teacherinfo; 
