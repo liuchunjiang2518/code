@@ -1,0 +1,8 @@
+-- SQLBook: Code
+SELECT DATABASE();
+CREATE TABLE emp(
+    name VARCHAR(20) COMMENT '姓名',
+    age TINYINT UNSIGNED COMMENT '年龄',
+    id VARCHAR(18) COMMENT '身份证号'
+);
+INSERT INTO emp VALUES 
