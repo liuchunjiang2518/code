@@ -20,4 +20,5 @@ ALTER TABLE info RENAME TO teacherinfo;
 ALTER TABLE teacherinfo ENGINE=MYISAM;
 ALTER TABLE teacherinfo CHARACTER SET GBK;
 SHOW CREATE TABLE teacherinfo;
-SELECT * FROM teacherinfo; 
+SELECT * FROM teacherinfo;
+DROP DATABASE schoolinfo; 
