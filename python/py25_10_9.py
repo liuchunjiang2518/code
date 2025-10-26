@@ -1,23 +1,23 @@
-# import pytest
-# import pygame
-# import random
-# import time
+import pytest
+import pygame
+import random
+import time
 # 异常
 # raise Exception('ERROR')
-# def funa():
-#     raise Exception('你错了')
-#     print('haha') # 不会执行
-# funa()
-# def funa():
-#     password=input('请输入密码')
-#     if(len(password)>=6):
-#         print('密码输入成功')
-#         return password
-#     raise Exception ('密码应大于六位')
-# try:
-#     funa()
-# except Exception as e:
-#     print(e)
+def funa():
+    raise Exception('你错了')
+    print('haha') # 不会执行
+funa()
+def funa():
+    password=input('请输入密码')
+    if(len(password)>=6):
+        print('密码输入成功')
+        return password
+    raise Exception ('密码应大于六位')
+try:
+    funa()
+except Exception as e:
+    print(e)
 
 # 模块 一个py文件就是一个模块
 # 内置模块
@@ -49,4 +49,4 @@
 # 包
 # 将有联系的模块放入同一个文件夹，并加入__init__.py
 import pack25_10_9
-pack25_10_9.register.reg()
+pack25_10_9.register.reg()  
