@@ -1,0 +1,68 @@
+-- SQLBook: Code
+-- Active: 1761280113892@@127.0.0.1@3306@mydatabase
+SELECT DATABASE();
+CREATE TABLE dep(
+    d_id CHAR(3) NOT NULL COMMENT '部门编号',
+    d_name VARCHAR(10) NOT NULL COMMENT '部门名称',
+    PRIMARY KEY(d_id),
+    UNIQUE KEY uk_d_name(d_name)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '部门表';
+CREATE TABLE emp(
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '员工编号',
+    name VARCHAR(20) NOT NULL COMMENT '员工姓名',
+    age TINYINT UNSIGNED NOT NULL COMMENT '员工年龄',
+    d_id CHAR(3) NOT NULL COMMENT '部门编号',
+    gender ENUM('男','女') NOT NULL COMMENT '员工性别',
+    hiredate DATETIME NOT NULL COMMENT '入职时间',
+    address VARCHAR(30) NOT NULL COMMENT '家庭住址',
+    PRIMARY KEY(id),
+    FOREIGN KEY(d_id) REFERENCES dep(d_id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '员工表' AUTO_INCREMENT=1001;
+SHOW TABLES;
+SHOW CREATE TABLE dep;
+SHOW CREATE TABLE emp;
+ALTER TABLE emp ADD COLUMN salary INT NOT NULL COMMENT '工资';
+INSERT INTO dep VALUES 
+    ('DEV','研发部'),
+    ('MGT','管理部'),
+    ('PRO','生产部');
+SELECT * FROM emp;
+DESC emp;
+INSERT INTO emp (name,age,d_id,gender,hiredate,address,salary) VALUES
+    ('张明', 32, 'DEV', '男', '2015-03-12', '北京', 3800),
+    ('李娜美', 28, 'PRO', '女', '2020-07-25', '上海', 2900),
+    ('赵晓明', 36, 'DEV', '女', '2012-09-18', '北京', 5200),
+    ('刘洋', 51, 'MGT', '男', '2007-06-30', '上海', 5800),
+    ('陈雨', 25, 'PRO', '女', '2024-01-10', '西安', 2500),
+    ('周浩然', 39, 'DEV', '男', '2018-04-22', '北京', 4500),
+    ('吴婷', 42, 'MGT', '女', '2010-08-15', '上海', 5100),
+    ('郑凯', 31, 'PRO', '男', '2019-12-03', '西安', 3200),
+    ('孙萌', 29, 'DEV', '女', '2021-05-17', '北京', 3600),
+    ('马哲', 55, 'MGT', '男', '2008-02-28', '成都', 6000),
+    ('朱琳琳', 34, 'PRO', '女', '2016-10-09', '西安', 4100),
+    ('胡伟', 48, 'DEV', '男', '2011-01-14', '北京', 5300),
+    ('林菲', 37, 'MGT', '女', '2013-07-21', '上海', 4900),
+    ('黄志强', 40, 'PRO', '男', '2017-08-01', '西安', 4300),
+    ('何静怡', 33, 'DEV', '女', '2022-09-30', '北京', 3700),
+    ('罗阳', 53, 'MGT', '男', '2007-12-19', '上海', 5700),
+    ('韩雪', 27, 'PRO', '女', '2023-03-08', '西安', 2700),
+    ('石浩然', 41, 'DEV', '男', '2016-02-13', '北京', 4400),
+    ('邓明', 38, 'DEV', '男', '2014-06-11', '北京', 4800),
+    ('谢敏', 46, 'MGT', '女', '2009-05-24', '上海', 5400),
+    ('高人杰', 30, 'PRO', '男', '2020-11-16', '成都', 3100),
+    ('秦凯生', 49, 'PRO', '男', '2010-10-12', '西安', 4200),
+    ('彭丽', 43, 'DEV', '女', '2012-04-07', '北京', 5000),
+    ('卢婷', 35, 'PRO', '女', '2019-01-29', '西安', 3900),
+    ('姚静', 26, 'MGT', '女', '2024-02-20', '上海', 2600),
+    ('宋宇浩', 57, 'MGT', '男', '2008-09-20', '上海', 5600),
+    ('薛萌', 32, 'DEV', '女', '2018-07-05', '成都', 3400),
+    ('叶军', 52, 'MGT', '男', '2007-08-18', '上海', 5900),
+    ('白玲', 44, 'PRO', '女', '2011-12-25', '西安', 4700),
+    ('王建国', 45, 'MGT', '男', '2009-11-05', '西安', 5500);
+
+
+
+
+
+
+-- SQLBook: Code

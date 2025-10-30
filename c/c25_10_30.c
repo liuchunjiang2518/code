@@ -9,9 +9,9 @@ typedef struct threadNode
     int ltag,rtag;
 }threadNode;
 
-threadNode* prev=NULL;
 char str[]="ABDH##I##EJ###CF##G##";
 int idx=0;
+threadNode* prev=NULL;
 
 void createTree(threadNode** T)
 {
@@ -61,9 +61,9 @@ void threading(threadNode* T)
 void inOrderThreading(threadNode** head,threadNode* T)
 {
     *head=(threadNode*)malloc(sizeof(threadNode));
-    (*head)->right=*head;
     (*head)->ltag=0;
     (*head)->rtag=1;
+    (*head)->right=*head;
     if(T==NULL)
     {
         (*head)->left=*head;
