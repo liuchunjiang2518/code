@@ -1,0 +1,14 @@
+-- SQLBook: Code
+-- Active: 1761280113892@@127.0.0.1@3306@mysql
+SELECT * FROM user;
+CREATE USER 'itcast'@'localhost' IDENTIFIED BY '123456';
+
+-- 在任意主机访问该数据库
+CREATE USER 'wanchunhong'@'%' IDENTIFIED BY '123456';
+
+--修改密码
+ALTER USER 'wanchunhong'@'%' IDENTIFIED WITH mysql_native_password BY 'wch206012';
+
+--删除用户
+DROP USER 'wanchunhong'@'%';
+DROP USER 'itcast'@'localhost';

@@ -1,0 +1,24 @@
+-- SQLBook: Code
+-- Active: 1761280113892@@127.0.0.1@3306@mydatabase
+SELECT DATABASE();
+SELECT address,avg(salary) FROM emp GROUP BY address; --按地址计算平均工资
+SELECT COUNT(*) FROM emp; --数据总数
+SELECT * FROM emp LIMIT 5,10;
+SELECT * FROM emp WHERE gender='女' AND age IN(31,32,34,35);
+SELECT * FROM emp WHERE gender='男' AND (age BETWEEN 40 AND 50) AND name LIKE'___';
+SELECT gender,COUNT(*) FROM emp WHERE age<=50 GROUP BY gender;
+SELECT name,age FROM emp WHERE age<=35 ORDER BY age DESC,hiredate DESC;
+
+SELECT * FROM emp WHERE (age BETWEEN 20 AND 40) AND gender='男' ORDER BY age DESC LIMIT 5;
+SELECT * FROM(
+    SELECT * FROM emp
+    WHERE (age BETWEEN 20 AND 40) AND gender='男'
+    LIMIT 5
+) AS t_select
+    ORDER BY age;
+
+
+
+
+
+-- SQLBook: Code

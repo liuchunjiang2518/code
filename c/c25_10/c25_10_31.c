@@ -1,4 +1,4 @@
-//求最大深度
+//求最大深度，层序遍历
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
