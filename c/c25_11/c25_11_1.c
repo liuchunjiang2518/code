@@ -68,5 +68,14 @@ int wpl(treeNode** T)
         }
         depth++;
     }
+    printf("权重：%d",wpl);
     return wpl;
+}
+
+int main()
+{
+    treeNode* root=NULL;
+    createTree(&root);
+    wpl(&root);
+    return 0;
 }
