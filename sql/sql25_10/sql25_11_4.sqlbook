@@ -1,0 +1,11 @@
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@mysql
+-- Active: 1761280113892@@127.0.0.1@3306@mysql
+SELECT * FROM user;
+SHOW GRANTS FOR 'wan'@'localhost';
+CREATE USER 'wan'@'localhost' IDENTIFIED BY '123456';
+GRANT ALL ON *.* TO 'wan'@'localhost';
+FLUSH PRIVILEGES;
+SHOW GRANTS FOR 'wan'@'localhost';
+DROP USER 'wan'@'localhost';
+
