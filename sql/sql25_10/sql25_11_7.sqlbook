@@ -1,0 +1,12 @@
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@mydatabase
+SELECT * FROM emp;
+-- 函数使用
+-- 字符串函数
+SELECT CONCAT('H','e','l','l','o');
+SELECT LOWER('HELLO');
+SELECT UPPER('hello');
+SELECT RPAD('12',5,'0');
+SELECT LPAD('19',5,'*');
+SELECT TRIM(" HELLO WORLD "); -- 去掉左右空格
+SELECT SUBSTRING('Hello World',1,5); --截取字符串

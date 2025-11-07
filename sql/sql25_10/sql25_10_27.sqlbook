@@ -1,4 +1,5 @@
 -- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@mydatabase
 -- Active: 1761280113892@@127.0.0.1@3306@mydatabase
 SELECT DATABASE();
 CREATE TABLE dep(
