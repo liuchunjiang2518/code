@@ -1,8 +1,8 @@
 //实验一
 //线性表基本运算算法设计
-
 #include <stdlib.h>
 #include <stdio.h>
+
 //顺序表
 #define maxsize 100
 
@@ -25,7 +25,7 @@ list* initList()
 //指定位置插入元素
 int insertElem(list* l,int pos,int n)
 {
-    if(l->len>=maxsize)
+    if(l->len>maxsize-1)
     {
         return 2;
     }
@@ -38,6 +38,7 @@ int insertElem(list* l,int pos,int n)
         l->data[i]=l->data[i-1];
     }
     l->data[pos-1]=n;
+    printf("在位置%d加入了元素%d\n",pos,n);
     l->len++;
     return 0;
 }
@@ -53,6 +54,7 @@ int deleteElem(list* l,int pos)
     {
         return 1;
     }
+    printf("在位置%d删除了元素%d\n",pos,l->data[pos-1]);
     for(int i=pos;i<l->len;i++)
     {
         l->data[i-1]=l->data[i];
@@ -67,6 +69,7 @@ int selectElem(list* l,int n)
     for(int i=0;i<l->len;i++)
     {
         if(l->data[i]==n)
+        printf("%d位置是%d\n",n,i+1);
         return i+1;
     }
     return 0;
@@ -75,6 +78,7 @@ int selectElem(list* l,int n)
 //遍历元素
 void traverseList(list* l)
 {
+    printf("遍历结果:");
     for(int i=0;i<l->len;i++)
     {
         printf("%d ",l->data[i]);
@@ -85,16 +89,16 @@ void traverseList(list* l)
 //测试顺序表
 int testList()
 {
+
     list* l=initList();
-    insertElem(l,1,10);
-    insertElem(l,2,20);
-    insertElem(l,3,30);
-    insertElem(l,4,40);    
-    insertElem(l,5,50);
+    for(int i=0;i<5;i++)
+    {
+        insertElem(l,i,i*10);
+    }
     traverseList(l);
     deleteElem(l,3);
-    printf("20位置是%d\n",selectElem(l,20));
     traverseList(l);
+    selectElem(l,3);
     insertElem(l,3,30);
     traverseList(l);
     return 0;
@@ -131,8 +135,9 @@ int insertNode(node* l,int pos,int n)
             return 1;
         }
     }
-    p->next=q->next;
     p->data=n;
+    printf("在位置%d插入了元素%d\n",pos,p->data);
+    p->next=q->next;
     q->next=p;
     return 0;
 }
@@ -149,11 +154,64 @@ int deleteNode(node* l,int pos)
             return 1;
         }
     }
+    node* p=q->next;
+    q->next=p->next;
+    printf("在位置%d删除了元素%d\n",pos,p->data);
+    free(p);
+    return 0;
+}
+
+//查找指定元素的位置
+int selectNode(node* l,int n)
+{
+    node* p=l;
+    int pos=0;
+    while(p!=NULL)
+    {
+        p=p->next;
+        pos++;
+        if(p->data==n)
+        {
+            printf("%d的位置是%d\n",p->data,pos);
+            return pos;
+        }
+    }
+    return 0;
+}
+
+//遍历链表
+void traverseNode(node* l)
+{
+    printf("遍历结果:");
+    node* p=l->next;
+    while(p!=NULL)
+    {
+        printf("%d ",p->data);
+        p=p->next;
+    }
+    printf("\n");
+}
+
+//测试链表
+int testNode()
+{
+    node* head=initNode();
+    for(int i=0;i<5;i++)
+    {
+        insertNode(head,i,i*10);
+    }   
+    traverseNode(head);
+    deleteNode(head,3);
+    traverseNode(head);
+    selectNode(head,40);
+    insertNode(head,3,30);
+    traverseNode(head);
     return 0;
 }
 
 int main()
 {
     testList();
+    testNode();
     return 0;
 }
