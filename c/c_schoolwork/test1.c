@@ -2,10 +2,9 @@
 //线性表基本运算算法设计
 #include <stdlib.h>
 #include <stdio.h>
-
-//顺序表
 #define maxsize 100
 
+//顺序表
 //创建顺序表结构体
 typedef struct list
 {
@@ -105,7 +104,6 @@ int testList()
 }
 
 //链表
-
 //创建链表结构体
 typedef struct node
 {
