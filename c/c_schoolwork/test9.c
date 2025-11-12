@@ -103,7 +103,7 @@ int bstSearch(treeNode* T,int n,treeNode* parent,treeNode** pos)
     }
 }
 
-int main()
+int test_bstSearch()
 {
     treeNode* T=NULL;
     treeNode* P=NULL;
@@ -112,5 +112,11 @@ int main()
     printf("\n");
     bstSearch(T,80,NULL,&P);
     printf("%d ",P->data);
+    return 0;
+}
+
+int main()
+{
+    test_bstSearch();
     return 0;
 }
