@@ -79,7 +79,7 @@ void printMaze(int maze[MAX_ROW][MAX_COL],int row,int col,stack* path)
         temp_maze[path->data[i].x][path->data[i].y]=2;
     }
     printf("迷宫路径(2表示路径):\n");
-    for (int i=0;i<row;i++)
+    for(int i=0;i<row;i++)
     {
         for(int j=0;j<col;j++)
         {
@@ -109,13 +109,13 @@ int mazeSolveByStack(int maze[MAX_ROW][MAX_COL],int row,int col)
     {
         pos curr;
         getTop(&path,&curr);
-        if (curr.x==end.x&&curr.y==end.y)
+        if(curr.x==end.x&&curr.y==end.y)
         {
             printMaze(maze,row,col,&path);
             return 1;
         }
         int found=0; 
-        for (int i=0;i<4;i++)
+        for(int i=0;i<4;i++)
         {
             int nx=curr.x+dir[i][0];
             int ny=curr.y+dir[i][1];
