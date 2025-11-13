@@ -6,7 +6,7 @@
 
 //顺序表
 //创建顺序表结构体
-typedef struct list
+typedef struct
 {
     int* data;
     int len;
