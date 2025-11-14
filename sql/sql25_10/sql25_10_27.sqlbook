@@ -1,6 +1,6 @@
 -- SQLBook: Code
 -- Active: 1762253198320@@127.0.0.1@3306@mydatabase
--- Active: 1761280113892@@127.0.0.1@3306@mydatabase
+-- Active: 1762253198320@@127.0.0.1@3306@mydatabase80113892@@127.0.0.1@3306@mydatabase
 SELECT DATABASE();
 CREATE TABLE dep(
     d_id CHAR(3) NOT NULL COMMENT '部门编号',
@@ -61,9 +61,8 @@ INSERT INTO emp (name,age,d_id,gender,hiredate,address,salary) VALUES
     ('白玲', 44, 'PRO', '女', '2011-12-25', '西安', 4700),
     ('王建国', 45, 'MGT', '男', '2009-11-05', '西安', 5500);
 
+DROP TABLE emp;
+DROP TABLE dep;
 
 
 
-
-
--- SQLBook: Code

@@ -1,0 +1,142 @@
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@mydatabase
+-- Active: 1762253198320@@127.0.0.1@3306@mydatabase
+SELECT DATABASE();
+SELECT * FROM emp;
+-- 约束
+-- 非空且唯一
+-- INT id NOT NULL UNIQUE
+-- 加值的限制条件
+-- CHECK
+-- DEFAULT 没有值时为1
+
+-- 示例
+SELECT DATABASE();
+CREATE TABLE test1(
+    id INT PRIMARY KEY AUTO_INCREMENT, -- 主键，自增
+    name VARCHAR(20) NOT NULL UNIQUE, -- 非空，唯一
+    age INT CHECK(age>0&&age<=120), -- 限制年龄为0~120
+    status CHAR(1) DEFAULT'1', -- 无值时为1
+    gender char(1)
+)comment '测试1';
+INSERT INTO test1(name,age,status,gender) VALUES 
+    ('Tom',15,'3','男'),
+    ('lucy',13,'0','女'),
+    ('Bob',29,NULL,'男');
+INSERT INTO test1(name,age,gender) VALUES
+    ('WAn',19,'男');
+SELECT * FROM test1;
+CREATE TABLE primaryTest(
+    foreignID INT PRIMARY KEY
+);
+CREATE TABLE foreignTest(
+    id INT
+);
+
+ALTER TABLE foreignTest ADD CONSTRAINT `编号` FOREIGN KEY(id) REFERENCES primaryTest(foreignID); 
+
+-- MYSQL似乎不支持这个命令
+ALTER TABLE foreignTest RENAME CONSTRAINT `编号` TO `fk_foreign_test_primary`;
+
+ALTER TABLE foreignTest 
+DROP FOREIGN KEY `编号`;
+
+-- 步骤2：重新创建外键约束（新约束名：fk_foreign_test_primary）
+ALTER TABLE foreignTest 
+ADD CONSTRAINT `fk_foreign_test_primary` 
+FOREIGN KEY(id) 
+REFERENCES primaryTest(foreignID);
+
+SELECT * FROM foreigntest;
+SELECT * FROM primarytest;
+
+DROP TABLE foreigntest;
+DROP TABLE primarytest;
+
+-- 多表查询
+-- 多对多
+CREATE TABLE stu(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    name VARCHAR(10) COMMENT '姓名',
+    num VARCHAR(10) COMMENT '学号'
+)COMMENT '学生表';
+INSERT INTO stu(name,num) VALUES
+    ('Wan','07120219'),
+    ('Chun','09010325'),
+    ('Hong','12090101');
+ 
+CREATE TABLE course(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    name VARCHAR(10) COMMENT '课程名称'
+)COMMENT '课程表';
+INSERT INTO course(name) VALUES
+    ('Math'),('Java'),('Python');
+
+CREATE TABLE stu_course(
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    stuID INT NOT NULL COMMENT '学生ID',
+    courseID INT NOT NULL COMMENT '课程ID',
+    CONSTRAINT fk_stuID FOREIGN KEY(stuID) REFERENCES stu(id),
+    CONSTRAINT fk_courseID FOREIGN KEY(courseID) REFERENCES course(id)
+)COMMENT '学生课程中间表';
+
+SELECT * FROM stu_course;
+
+-- 一对一表关系
+CREATE TABLE player(
+    id INT PRIMARY KEY AUTO_INCREMENT COMMENT '玩家ID',
+    name CHAR(20) UNIQUE NOT NULL COMMENT '玩家名称'
+)COMMENT '玩家信息表';
+INSERT INTO player(name) VALUES 
+    ('Wan'),
+    ('Chun'),
+    ('Hong');
+
+CREATE TABLE play_info(
+    id INT AUTO_INCREMENT COMMENT'玩家ID',
+    degree VARCHAR(20) NOT NULL COMMENT '学历',
+    major VARCHAR(20) NOT NULL COMMENT '专业',
+    school VARCHAR(20) NOT NULL COMMENT '学校',
+    CONSTRAINT `fk_playerID` FOREIGN KEY(id) REFERENCES player(id)
+)COMMENT '玩家学历表';
+INSERT INTO play_info(degree,major,school) VALUES
+    ('高中','数学','朝阳高中');
+
+-- 多表查询语句示例
+SELECT * FROM emp,dep WHERE emp.d_id=dep.d_id ORDER BY emp.id;
+-- 内连接(查询A,B交集部分)
+-- 外连接(分左右:查询左(右)所有数据以及交集)
+-- 自连接(当前表与自身链接，必须用别名)
+
+
+-- 内连接
+-- 查询员工姓名及对应部门名
+-- 隐式
+SELECT emp.name,dep.d_name FROM emp,dep WHERE emp.d_id=dep.d_id;
+-- 显式
+SELECT e.name,d.d_name FROM emp e INNER JOIN dep d ON d.d_id=e.d_id; -- INNER 可以省略
+
+-- 外连接
+-- 左外连接
+SELECT e.*,d.d_name FROM emp e LEFT OUTER JOIN dep d ON d.d_id=e.d_id;
+-- 右外连接
+SELECT d.*,e.name FROM emp e RIGHT OUTER JOIN dep d ON d.d_id=e.d_id;
+
+ALTER TABLE emp ADD COLUMN managerID INT COMMENT '管理员ID';
+UPDATE emp
+    SET `managerID`=CASE 
+        WHEN d_id='DEV' THEN 1001
+        WHEN d_id='PRO' THEN 1002
+        WHEN d_id='MGT' THEN 1004
+        ELSE NULL  
+    END;
+-- 自连接(可以是外连接也可以是内连接)
+SELECT
+    e.id,
+    e.name AS '员工名',
+    m.name AS '管理员名' 
+    FROM emp e 
+    LEFT JOIN emp m 
+    ON e.`managerID`=m.id;
+UPDATE emp SET `managerID`=NULL WHERE id IN(1001,1002,1004);
+SELECT e.*,m.name FROM emp e LEFT JOIN emp m ON e.`managerID`=m.id;
