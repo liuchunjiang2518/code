@@ -122,14 +122,6 @@ SELECT e.*,d.d_name FROM emp e LEFT OUTER JOIN dep d ON d.d_id=e.d_id;
 -- 右外连接
 SELECT d.*,e.name FROM emp e RIGHT OUTER JOIN dep d ON d.d_id=e.d_id;
 
-ALTER TABLE emp ADD COLUMN managerID INT COMMENT '管理员ID';
-UPDATE emp
-    SET `managerID`=CASE 
-        WHEN d_id='DEV' THEN 1001
-        WHEN d_id='PRO' THEN 1002
-        WHEN d_id='MGT' THEN 1004
-        ELSE NULL  
-    END;
 -- 自连接(可以是外连接也可以是内连接)
 SELECT
     e.id,
@@ -138,5 +130,9 @@ SELECT
     FROM emp e 
     LEFT JOIN emp m 
     ON e.`managerID`=m.id;
-UPDATE emp SET `managerID`=NULL WHERE id IN(1001,1002,1004);
-SELECT e.*,m.name FROM emp e LEFT JOIN emp m ON e.`managerID`=m.id;
+
+DROP TABLE play_info;
+DROP TABLE player;
+DROP TABLE stu;
+DROP TABLE stu_course;
+DROP TABLE course;

@@ -1,0 +1,37 @@
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@mydatabase
+-- 多表查询示例
+
+-- 1.查询员工的姓名、年龄、部门信息。
+SELECT e.name,e.age,d.d_id FROM emp e JOIN dep d ON e.d_id=d.d_id;
+SELECT e.name,e.age,d.d_id FROM emp e,dep d WHERE e.d_id=d.d_id;
+
+-- 2.查询年龄小于30岁的员工姓名、年龄、部门信息。
+SELECT e.name,e.age,d.d_name FROM emp e JOIN dep d ON d.d_id=e.d_id WHERE e.age<30;
+
+-- 3.查询拥有员工的部门ID、部门名称。
+SELECT d.d_id,d.d_name 
+FROM dep d 
+WHERE d.d_id=ANY(
+        SELECT e.d_id  
+        FROM emp e
+);
+SELECT DISTINCT d.d_id,d.d_name 
+FROM dep d 
+JOIN emp e 
+ON d.d_id=e.d_id; 
+
+-- 4.查询所有年龄大于40岁的员工，及其归属的部门名称；如果员工没有分配部门，也需要展示出来。
+SELECT e.*,d.d_name FROM emp e LEFT JOIN dep d ON e.d_id=d.d_id WHERE e.age>40;
+
+-- 5.查询所有员工的工资等级。
+
+
+-- 6.查询“研发部”所有员工的信息及工资等级。
+-- 7.查询“研发部”员工的平均工资。
+-- 8.查询工资比”灭绝”高的员工信息。
+-- 9.查询比平均薪资高的员工信息。
+-- 10.查询低于本部门平均工资的员工信息。
+-- 11.查询所有的部门信息，并统计部门的员工人数。
+-- 12.查询所有学生的选课情况，展示出学生名称，学号，课程名称
+-- SQLBook: Code

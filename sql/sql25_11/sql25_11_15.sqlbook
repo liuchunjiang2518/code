@@ -1,0 +1,83 @@
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@mydatabase
+SELECT DATABASE();
+-- 联合查询
+-- 把多次查询结果联合起来
+-- salary小于5000和age大于40
+SELECT * FROM emp WHERE salary<5000
+UNION
+SELECT * FROM emp WHERE age>40; -- UNION显示不重复的 UNION ALL显示包括重复的
+
+-- 子查询
+-- 标量子查询
+-- 查询研发部员工信息
+SELECT * FROM emp WHERE d_id=(SELECT d_id FROM dep WHERE d_name='研发部');
+
+-- 查询张明入职后的员工信息
+SELECT * FROM emp WHERE hiredate>(SELECT hiredate FROM emp WHERE name='张明');
+
+-- 列子查询
+-- 查询研发部和生产部
+SELECT * 
+FROM emp 
+WHERE d_id 
+IN(
+    SELECT d_id 
+    FROM dep 
+    WHERE d_name='研发部' 
+    OR d_name='生产部'
+);
+
+-- 查询比研发部所有人salary都高的员工信息
+SELECT * 
+FROM emp 
+WHERE salary>(
+    SELECT max(salary) 
+    FROM emp 
+    WHERE d_id=(
+        SELECT d_id 
+        FROM dep 
+        WHERE d_name='研发部'
+    )
+);
+-- 关键字ALL,ANY,SOME,IN(范围)
+SELECT * FROM emp WHERE salary>ALL(
+    SELECT salary FROM emp WHERE d_id=(
+        SELECT d_id FROM dep WHERE d_name='研发部'
+    )
+);
+
+-- 行子查询
+-- 查询与胡伟的薪资及领导相同的员工信息
+SELECT name,salary,managerID FROM emp WHERE name='胡伟';
+
+SELECT * 
+FROM emp 
+WHERE (salary,`managerID`)=(
+        SELECT salary,`managerID` 
+        FROM emp 
+        WHERE name='胡伟'
+);
+
+-- 表子查询
+
+-- 查询与胡伟，白玲住址和薪资相同的员工信息
+SELECT * 
+FROM emp 
+WHERE (address,salary) 
+IN(
+    SELECT address,salary
+    FROM emp 
+    WHERE name='胡伟' 
+    OR name='白玲'
+);
+
+-- 查询入职时间在"2015-01-01"之后的员工信息及其部门信息
+SELECT e.*,d.*
+FROM (
+    SELECT * 
+    FROM emp 
+    WHERE hiredate > '2015-01-01'
+) e
+LEFT JOIN dep d 
+    ON e.d_id = d.d_id;

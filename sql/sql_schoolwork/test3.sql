@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS CompanyInfo DEFAULT CHARSET utf8;
 USE CompanyInfo;
+
 CREATE TABLE IF NOT EXISTS Department
 (
   d_id INT PRIMARY KEY,
@@ -7,6 +8,7 @@ CREATE TABLE IF NOT EXISTS Department
   `function` VARCHAR(20),
   address VARCHAR(30)
 );
+
 CREATE TABLE IF NOT EXISTS employee
 (
   id INT PRIMARY KEY,
@@ -18,11 +20,13 @@ CREATE TABLE IF NOT EXISTS employee
   address VARCHAR(50),
   FOREIGN KEY (d_id) REFERENCES Department(d_id)
 );
+
 INSERT INTO Department VALUES
   (1001, '人事部', '人事管理', '北京'),
   (1002, '科研部', '研发产品', '广州'),
   (1003, '生产部', '产品生产', '天津'),
   (1004, '销售部', '产品销售', '上海');
+
 INSERT INTO employee VALUES
   (8001, '韩鹏', '男', 25, 1002, 9000, '北京市海淀区'),
   (8002, '张峰', '男', 26, 1001, 7500, '北京市昌平区'),
@@ -31,6 +35,7 @@ INSERT INTO employee VALUES
   (8005, '欧阳宝贝', '女', 21, 1002, 7000, '北京市昌平区'),
   (8006, '呼延', '男', 28, 1003, 6800, '天津市南开区'),
   (8007, '刘恒', '男', 40, 1001, 6800, '北京市顺义区');
+
 INSERT INTO employee VALUES
   (8888,'万春宏','男',18,1002,8888,'北京市朝阳区');
 UPDATE Department SET address ='北京' WHERE d_id = 1002;

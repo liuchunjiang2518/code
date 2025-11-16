@@ -8,27 +8,26 @@ CREATE TABLE dep(
     PRIMARY KEY(d_id),
     UNIQUE KEY uk_d_name(d_name)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '部门表';
+
 CREATE TABLE emp(
     id INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '员工编号',
     name VARCHAR(20) NOT NULL COMMENT '员工姓名',
     age TINYINT UNSIGNED NOT NULL COMMENT '员工年龄',
-    d_id CHAR(3) NOT NULL COMMENT '部门编号',
+    d_id CHAR(3) COMMENT '部门编号',
     gender ENUM('男','女') NOT NULL COMMENT '员工性别',
     hiredate DATETIME NOT NULL COMMENT '入职时间',
     address VARCHAR(30) NOT NULL COMMENT '家庭住址',
     PRIMARY KEY(id),
     FOREIGN KEY(d_id) REFERENCES dep(d_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT '员工表' AUTO_INCREMENT=1001;
-SHOW TABLES;
-SHOW CREATE TABLE dep;
-SHOW CREATE TABLE emp;
+
 ALTER TABLE emp ADD COLUMN salary INT NOT NULL COMMENT '工资';
+
 INSERT INTO dep VALUES 
     ('DEV','研发部'),
     ('MGT','管理部'),
     ('PRO','生产部');
-SELECT * FROM emp;
-DESC emp;
+
 INSERT INTO emp (name,age,d_id,gender,hiredate,address,salary) VALUES
     ('张明', 32, 'DEV', '男', '2015-03-12', '北京', 3800),
     ('李娜美', 28, 'PRO', '女', '2020-07-25', '上海', 2900),
@@ -60,6 +59,51 @@ INSERT INTO emp (name,age,d_id,gender,hiredate,address,salary) VALUES
     ('叶军', 52, 'MGT', '男', '2007-08-18', '上海', 5900),
     ('白玲', 44, 'PRO', '女', '2011-12-25', '西安', 4700),
     ('王建国', 45, 'MGT', '男', '2009-11-05', '西安', 5500);
+UPDATE emp SET salary=5300 WHERE name='石浩然';
+UPDATE emp SET salary=4700 WHERE name='朱琳琳';
+INSERT INTO dep VALUES
+    ('SAL','销售部');
+INSERT INTO emp(name,age,d_id,gender,hiredate,address,salary) VALUES
+    ('刘玉平',49,NULL,'男','2015-04-02','西安',5800);
+
+ALTER TABLE emp ADD COLUMN managerID INT COMMENT '管理员ID';
+UPDATE emp
+    SET `managerID`=CASE 
+        WHEN d_id='DEV' THEN 1001
+        WHEN d_id='PRO' THEN 1002
+        WHEN d_id='MGT' THEN 1004
+        ELSE NULL  
+    END;
+UPDATE emp SET `managerID`=NULL WHERE id IN(1001,1002,1004);
+
+CREATE TABLE salary_grade(
+    gradeID INT PRIMARY KEY COMMENT '薪资主键',
+    grade CHAR(2) NOT NULL COMMENT '薪资等级',
+    low_salary INT NOT NULL COMMENT '该等级最低薪资',
+    high_salary INT NOT NULL COMMENT '该等级最高薪资'
+)COMMENT '薪资等级表';
+
+ALTER TABLE emp 
+ADD COLUMN gradeID INT COMMENT '关联薪资等级表',
+ADD CONSTRAINT fk_emp_salary_grade 
+FOREIGN KEY (gradeID)
+REFERENCES salary_grade (gradeID) 
+ON DELETE SET NULL ON UPDATE CASCADE;
+
+INSERT INTO salary_grade (gradeID, grade, low_salary, high_salary) VALUES
+  (1, 'S1', 5001, 6000),
+  (2, 'S2', 4001, 5000),
+  (3, 'S3', 3001, 4000), 
+  (4, 'S4', 2000, 3000);
+
+-- 根据薪资范围匹配薪资等级
+UPDATE emp
+JOIN salary_grade sg 
+ON emp.salary 
+BETWEEN sg.low_salary 
+AND sg.high_salary
+SET emp.gradeID = sg.gradeID;
+
 
 DROP TABLE emp;
 DROP TABLE dep;
