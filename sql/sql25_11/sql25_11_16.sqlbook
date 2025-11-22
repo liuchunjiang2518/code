@@ -25,13 +25,98 @@ ON d.d_id=e.d_id;
 SELECT e.*,d.d_name FROM emp e LEFT JOIN dep d ON e.d_id=d.d_id WHERE e.age>40;
 
 -- 5.查询所有员工的工资等级。
-
+SELECT e.*,s.grade,s.low_salary,s.high_salary 
+FROM emp e,salary_grade s 
+WHERE s.low_salary<=e.salary 
+AND s.high_salary>=e.salary;
 
 -- 6.查询“研发部”所有员工的信息及工资等级。
+SELECT e.*,s.grade 
+FROM emp e 
+LEFT JOIN salary_grade s
+ON s.low_salary<=e.salary 
+AND s.high_salary>=e.salary
+WHERE e.d_id=(
+        SELECT d.d_id FROM dep d WHERE d_name='研发部'
+);
+
+SELECT e.*,s.grade
+FROM emp e,dep d,salary_grade s
+WHERE e.d_id=d.d_id
+AND (
+        s.low_salary<=e.salary 
+        AND s.high_salary>=e.salary
+)
+AND d.d_name='研发部';
+
 -- 7.查询“研发部”员工的平均工资。
--- 8.查询工资比”灭绝”高的员工信息。
+SELECT AVG(e.salary) AS 平均工资
+FROM emp e
+JOIN dep d
+ON e.d_id= d.d_id 
+WHERE d.d_name='研发部';
+
+SELECT AVG(e.salary)
+FROM emp e,dep d
+WHERE e.d_id=d.d_id
+AND d.d_name='研发部';
+
+-- 8.查询工资比”张明”高的员工信息。
+SELECT * 
+FROM emp 
+WHERE salary>(
+        SELECT salary 
+        FROM emp 
+        WHERE name='张明'
+); 
+-- 工资等级比他高的
+SELECT e.id,e.name,e.salary,s.grade
+FROM emp e
+JOIN salary_grade s
+ON s.low_salary<=e.salary 
+AND s.high_salary>=e.salary
+WHERE s.low_salary>(
+        SELECT sg.high_salary
+        FROM emp em
+        JOIN salary_grade sg
+        ON sg.low_salary<=em.salary 
+        AND sg.high_salary>=em.salary
+        WHERE em.name='张明'
+);
+SELECT 
+  e.id, e.name, e.salary, s.grade
+FROM emp e
+INNER JOIN salary_grade s
+  ON s.low_salary <= e.salary 
+  AND s.high_salary >= e.salary
+WHERE 
+  s.grade < COALESCE(
+    (SELECT MAX(sg.grade)
+     FROM emp em
+     JOIN salary_grade sg
+       ON sg.low_salary <= em.salary 
+       AND sg.high_salary >= em.salary
+     WHERE em.name = '张明'),
+    0
+  );
 -- 9.查询比平均薪资高的员工信息。
+SELECT * FROM emp WHERE salary>(
+        SELECT AVG(salary) FROM emp
+); 
+
 -- 10.查询低于本部门平均工资的员工信息。
+SELECT e.* 
+FROM emp e 
+WHERE e.salary<(
+        SELECT AVG(salary) 
+        FROM emp em 
+        WHERE e.d_id=em.d_id
+);
+                                                
 -- 11.查询所有的部门信息，并统计部门的员工人数。
--- 12.查询所有学生的选课情况，展示出学生名称，学号，课程名称
--- SQLBook: Code
+SELECT 
+        d.*,
+        (SELECT COUNT(*) 
+        FROM emp e 
+        WHERE e.d_id=d.d_id) 
+FROM dep d;

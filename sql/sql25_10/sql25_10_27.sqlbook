@@ -77,33 +77,17 @@ UPDATE emp
 UPDATE emp SET `managerID`=NULL WHERE id IN(1001,1002,1004);
 
 CREATE TABLE salary_grade(
-    gradeID INT PRIMARY KEY COMMENT '薪资主键',
     grade CHAR(2) NOT NULL COMMENT '薪资等级',
     low_salary INT NOT NULL COMMENT '该等级最低薪资',
     high_salary INT NOT NULL COMMENT '该等级最高薪资'
 )COMMENT '薪资等级表';
 
-ALTER TABLE emp 
-ADD COLUMN gradeID INT COMMENT '关联薪资等级表',
-ADD CONSTRAINT fk_emp_salary_grade 
-FOREIGN KEY (gradeID)
-REFERENCES salary_grade (gradeID) 
-ON DELETE SET NULL ON UPDATE CASCADE;
 
-INSERT INTO salary_grade (gradeID, grade, low_salary, high_salary) VALUES
-  (1, 'S1', 5001, 6000),
-  (2, 'S2', 4001, 5000),
-  (3, 'S3', 3001, 4000), 
-  (4, 'S4', 2000, 3000);
-
--- 根据薪资范围匹配薪资等级
-UPDATE emp
-JOIN salary_grade sg 
-ON emp.salary 
-BETWEEN sg.low_salary 
-AND sg.high_salary
-SET emp.gradeID = sg.gradeID;
-
+INSERT INTO salary_grade (grade,low_salary,high_salary) VALUES
+  ('S1', 5001, 6000),
+  ('S2', 4001, 5000),
+  ('S3', 3001, 4000), 
+  ('S4', 2000, 3000);
 
 DROP TABLE emp;
 DROP TABLE dep;
