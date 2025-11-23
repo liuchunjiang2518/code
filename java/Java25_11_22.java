@@ -4,7 +4,7 @@ public class Java25_11_22
     {
         System.out.println("Hello World");
         System.out.println(sum(1,2));
-        //test();
+        test();
     }
     //方法
     public static int sum(int x,int y)
@@ -13,7 +13,7 @@ public class Java25_11_22
     }
     public static void test()
     {
-        char a='a';
+        char a='b';
         System.out.println(a);
     }
 }

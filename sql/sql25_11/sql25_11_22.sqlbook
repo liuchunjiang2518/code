@@ -1,0 +1,143 @@
+-- SQLBook: Code
+-- (1) 创建数据库schoolInfo。
+CREATE DATABASE schoolinfo;
+USE schoolinfo;
+-- (2) 在数据库schoolInfo中，创建teacherInfo表，存储引擎设置为InnoDB，字符集设为UTF-8 (UTF8MB4)。
+CREATE TABLE teacherinfo(
+    id INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '编号',
+    num INT UNIQUE NOT NULL COMMENT '教工号',
+    name VARCHAR(20) NOT NULL COMMENT '姓名',
+    sex ENUM('男','女') NOT NULL COMMENT '性别',
+    birthday DATETIME COMMENT '出生日期',
+    address VARCHAR(50) COMMENT '家庭住址'
+)ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
+-- (3) 将 teacherInfo 表的name字段的数据类型改为 VARCHAR(30)。
+ALTER TABLE teacherinfo MODIFY name VARCHAR(30);
+-- (4) 将birthday字段的位置改到sex字段的前面。
+ALTER TABLE teacherinfo CHANGE birthday birthday DATETIME COMMENT '出生日期' AFTER name;
+-- (5) 将num字段名改名为t_id。
+ALTER TABLE teacherinfo CHANGE num t_id INT UNIQUE NOT NULL COMMENT '教工号';
+-- (6) 将teacherInfo 表的address字段删除。
+ALTER TABLE teacherinfo DROP address;
+-- (7) 在teacherInfo 表中增加名为wages的字段，数据类型为FLOAT。
+ALTER TABLE teacherinfo ADD wages FLOAT;
+-- (8) 将teacherInfo 表改名为Info，查询核实后再改为原名。
+ALTER TABLE teacherinfo RENAME TO Info;
+SELECT * FROM Info;
+ALTER TABLE Info RENAME TO teacherinfo;
+-- (9) 将teacherInfo 表的存储引擎更改为MyISAM类型。
+ALTER TABLE teacherinfo ENGINE=MyISAM;
+-- (10) 将teacherInfo 表的字符集更改为GBK。
+ALTER TABLE teacherinfo CHARSET=GBK;
+
+
+
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@staffinfo
+CREATE DATABASE staffinfo;
+USE staffinfo;
+-- (1) 创建department表。
+CREATE TABLE Department(
+    d_id INT UNIQUE NOT NULL PRIMARY KEY COMMENT '部门号',
+    d_name VARCHAR(20) UNIQUE NOT NULL COMMENT '部门名',
+    `function` VARCHAR(50) COMMENT '部门职能',
+    address VARCHAR(20) COMMENT '部门位置'
+);
+-- (2) 创建worker表（建立外键约束名为worker_fk）并查看表中的键值。
+CREATE TABLE worker(
+    id INT UNIQUE NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '编号',
+    num INT UNIQUE NOT NULL COMMENT '员工号',
+    d_id INT COMMENT '部门号',
+    name VARCHAR(20) UNIQUE COMMENT '姓名',
+    sex ENUM('男','女') UNIQUE COMMENT '性别',
+    birthday DATE COMMENT '出生日期',
+    address VARCHAR(50) COMMENT '家庭住址',
+    CONSTRAINT work_fk FOREIGN KEY (d_id) REFERENCES Department(d_id)
+);
+-- (3) 删除department表，查阅错误情况。
+--无法删除，以为与worker建立了外键约束
+-- (4) 删除worker表的外键约束worker_fk。
+ALTER TABLE worker DROP CONSTRAINT work_fk;
+-- (5) 重新删除department表，查阅执行情况。
+DROP TABLE department;
+-- (6) 在worker表中添加列身份证号(card)，设置为唯一约束，并查看表中的键值。
+ALTER TABLE worker ADD card CHAR(18) UNIQUE COMMENT '身份证号';
+SHOW KEYS FROM worker\G;
+
+DROP DATABASE staffinfo;
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@companyinfo
+CREATE DATABASE CompanyInfo;
+USE CompanyInfo;
+
+-- (1) 创建名为CompanyInfo数据库，在数据库中添加Department、employee两张表，在表中添加上述数据信息。最后在employee表中添加编号为8888的个人信息，所属部门为1002。
+CREATE TABLE Department(
+    d_id INT UNIQUE NOT NULL PRIMARY KEY COMMENT '部门号',
+    d_name VARCHAR(20) UNIQUE NOT NULL COMMENT '部门名称',
+    `function` VARCHAR(20) COMMENT '部门职能',
+    address VARCHAR(30) COMMENT '工作地点'
+);
+
+CREATE TABLE employee(
+    id INT UNIQUE NOT NULL PRIMARY KEY COMMENT '员工号',
+    name VARCHAR(20) NOT NULL COMMENT '姓名',
+    sex VARCHAR(4) NOT NULL COMMENT '性别',
+    age INT COMMENT '年龄',
+    d_id INT NOT NULL,
+    salary FLOAT COMMENT '工资',
+    address VARCHAR(50) COMMENT '家庭住址',
+    CONSTRAINT emp_fk FOREIGN KEY (d_id) REFERENCES Department(d_id)
+);
+
+INSERT INTO Department VALUES
+    (1001,'人事部','人事管理','北京'),
+    (1002,'科研部','研发产品','广州'),
+    (1003,'生产部','产品生产','天津'),
+    (1004,'销售部','产品销售','上海');
+
+INSERT INTO employee VALUES
+    (8001,'韩鹏','男',25,1002,9000,'北京市海淀区'),
+    (8002,'张峰','男',26,1001,7500,'北京市昌平区'),
+    (8003,'欧阳','男',20,1003,6000,'湖南省永州市'),
+    (8004,'王武','男',30,1001,8000,'北京市顺义区'),
+    (8005,'欧阳宝贝','女',21,1002,7000,'北京市昌平区'),
+    (8006,'呼延','男',28,1003,6800,'天津市南开区'),
+    (8007,'刘恒','男',40,1001,6800,'北京市顺义区');
+INSERT INTO employee VALUES
+    (8888,'万春宏','男',19,1002,9999,'成都市成华区');
+-- (2) 将1002的部门地点改为北京。
+UPDATE department SET address='北京' WHERE d_id=1002;
+-- (3) 将员工欧阳的工资改为8500
+UPDATE employee SET salary=8500 WHERE name='欧阳';
+-- (4) 删除员工刘恒的记录。
+DELETE FROM employee WHERE name='刘恒';
+-- (5) 查询employee表的所有记录。
+SELECT * FROM employee;
+-- (6) 查询employee表的第四条到第五条记录。
+SELECT * FROM employee LIMIT 3,2;
+-- (7) 从Department表查询部门号（d_id）、部门名称（d_name）和部门职能（function）
+SELECT `function`,d_id,d_name FROM department;
+-- (8) 从employee表中查询人事部和科研部的员工的信息。先从Department表查询出人事部和科研部的部门号。然后到employee表中去查询员工的信息。
+SELECT e.*,d.d_name FROM employee e JOIN department d ON e.d_id=d.d_id WHERE e.d_id IN(1001,1002); 
+-- (9) 从employee表中查询年龄在25到30之间的员工的信息。可以通过两种方式来查询。
+SELECT * FROM employee WHERE age BETWEEN 25 AND 30;
+-- (10) 查询每个部门有多少名员工。先按部门号进行分组，然后用COUNT()函数来计算每组的人数。
+SELECT d.d_name,COUNT(*) FROM employee e JOIN department d ON e.d_id=d.d_id GROUP BY d.d_name;
+-- (11) 查询每个部门的最高工资。先按部门号进行分组，然后用MAX()函数来计算最大值。
+SELECT d_id,MAX(salary) FROM employee GROUP BY d_id;
+-- (12) 用左连接的方式查询Department表和employee表。
+SELECT * FROM employee e JOIN Department d ON d.d_id=e.d_id;  
+-- (13) 计算每个部门的总工资。先按部门号进行分组，然后用SUM()函数来求和。
+SELECT d_id,SUM(salary) FROM employee GROUP BY d_id;
+-- (14) 查询employee表，按照工资从高到低的顺序排列。
+SELECT * FROM employee ORDER BY salary DESC;
+-- (15) 从Department表和employee表中查询出部门号，然后使用UNION合并查询结果 
+SELECT d_id FROM Department
+UNION ALL
+SELECT d_id FROM employee;
+-- (16) 查询家是北京市员工的姓名、年龄、家庭住址。这里使用 LIKE 关键字。
+SELECT name,age,address FROM employee WHERE address LIKE'北京市%';
+-- (17) 统计每个部门的男女职工人数。
+SELECT d_id,sex,COUNT(*) FROM employee GROUP BY d_id,sex;
+-- (18) 查询每个职工的员工号、姓名、性别、部门名称、家庭地址，各列名用汉字显示。
+SELECT e.name 姓名,e.id 员工号,e.sex 性别,d.d_name 部门名称,e.address 家庭住址 FROM employee e JOIN department d ON e.d_id=d.d_id;

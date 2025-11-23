@@ -1,3 +1,52 @@
 -- SQLBook: Code
 -- 索引
--- B-Tree
+-- BTree B+Tree Hash
+
+
+CREATE TABLE tb_user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    phone CHAR(11) NOT NULL,
+    email VARCHAR(100),
+    profession VARCHAR(50),
+    age INT,
+    gender CHAR(1),
+    status TINYINT DEFAULT 0,
+    createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+DROP TABLE tb_user;
+-- 插入25条tb_user模拟数据 (createtime: 2001-2007)
+INSERT INTO tb_user (name, phone, email, profession, age, gender, status, createtime) VALUES
+('张三', '13800138000', 'zhangsan@example.com', '程序员', 28, '男', 0, '2001-05-10 09:30:00'),
+('李四', '13800138001', 'lisi@example.com', '设计师', 25, '女', 0, '2002-03-15 14:20:00'),
+('王五', '13800138002', 'wangwu@example.com', '产品经理', 30, '男', 0, '2003-07-22 10:15:00'),
+('赵六', '13800138003', 'zhaoliu@example.com', '运营', 27, '女', 0, '2004-01-08 16:40:00'),
+('孙七', '13800138004', 'sunqi@example.com', '测试工程师', 26, '男', 0, '2005-09-30 08:50:00'),
+('周八', '13800138005', 'zhouba@example.com', 'UI设计师', 24, '女', 0, '2006-06-18 11:25:00'),
+('吴九', '13800138006', 'wujia@example.com', '后端开发', 32, '男', 0, '2007-02-14 15:10:00'),
+('郑十', '13800138007', 'zhengshi@example.com', '前端开发', 29, '女', 0, '2001-11-27 13:35:00'),
+('小明', '13900139000', 'xiaoming@example.com', '学生', 20, '男', 1, '2002-08-05 07:45:00'),
+('小红', '13900139001', 'xiaohong@example.com', '教师', 35, '女', 1, '2003-10-12 12:00:00'),
+('小刚', '13900139002', 'xiaogang@example.com', '医生', 33, '男', 1, '2004-04-19 17:20:00'),
+('小丽', '13900139003', 'xiaoli@example.com', '护士', 28, '女', 1, '2005-06-28 09:10:00'),
+('张三', '13900139004', 'xiaoqiang@example.com', '警察', 30, '男', 1, '2006-03-03 14:50:00'),
+('小美', '13900139005', 'xiaomei@example.com', '律师', 31, '女', 1, '2007-07-11 10:40:00'),
+('小亮', '13900139006', 'xiaoliang@example.com', '记者', 27, '男', 1, '2001-09-01 16:05:00'),
+('小芳', '13900139007', 'xiaofang@example.com', '编辑', 26, '女', 1, '2002-12-14 11:30:00'),
+('周八', '18600186000', 'laowang@example.com', '架构师', 40, '男', 2, '2003-05-20 13:20:00'),
+('老李', '18600186001', 'laoli@example.com', 'CTO', 45, '男', 2, '2004-08-25 15:45:00'),
+('老张', '18700187000', 'laozhang@example.com', '销售', 36, '男', 3, '2005-11-08 10:00:00'),
+('老刘', '18700187001', 'laoliu@example.com', '市场', 34, '女', 3, '2006-01-17 09:20:00'),
+('老陈', '18800188000', 'laochen@example.com', '财务', 38, '女', 4, '2007-04-30 14:10:00'),
+('老杨', '18900189000', 'laoyang@example.com', '人力', 37, '女', 5, '2001-06-12 16:30:00'),
+('老黄', '19900199000', 'laohuang@example.com', '行政', 39, '男', 6, '2002-07-19 11:50:00');
+-- SQLBook: Code
+SHOW INDEX FROM tb_user\G;
+-- 创建phone的唯一索引
+CREATE UNIQUE INDEX idx_user_phone ON tb_user(phone);
+-- 创建职业，年龄，状态的联合索引
+CREATE INDEX idx_user_pro_age_sta ON tb_user(profession,age,status);
+-- 创建邮箱索引
+CREATE INDEX idx_user_email ON tb_user(email);
+-- 删除索引
+DROP INDEX idx_user_email ON tb_user;
