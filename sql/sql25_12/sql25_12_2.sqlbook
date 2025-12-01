@@ -1,0 +1,154 @@
+-- SQLBook: Markup
+创建存储过程  
+```
+CREATE PROCEDURE 存储过程名称([参数列表])  
+BEGIN  
+    SQL语句  
+END
+```
+删除存储过程  
+`DROP PROCEDURE 存储过程名称;`  
+  
+查询数据库存储过程及其状态  
+`SELECT * FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA = 'xxx';`
+`SHOW CREATE 存储过程名称`
+-- SQLBook: Code
+CREATE PROCEDURE p1()
+BEGIN
+    SELECT COUNT(*) FROM emp;
+END;
+CALL p1;
+SELECT * FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA = 'mydatabase';
+DROP PROCEDURE IF EXISTS p1;  --删除
+
+-- SQLBook: Markup
+通过`DELIMITER $$分割语句`  
+实际作用为将语句的分割符改为`$$`  
+`//`等也可以  
+企业规范为`$$`  
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE p1()
+BEGIN
+    SELECT SUM(salary) FROM emp;
+END//
+DELIMITER ;
+CALL p1;
+-- SQLBook: Markup
+变量  
+系统变量分为全局变量和会话变量  
+全局变量(`GLOBAL`)  
+会话变量(`SESSION`)  
+一个`.sql`可以视为一个会话   
+  
+查询变量  
+`SHOW  [SESSION|GLOBAL] VARIABLES LIKE ''`  
+  
+查看指定变量  
+`SELECT @@[SESSION|GLOBAL].系统变量名`  
+  
+设置系统变量  
+`SET [SESSION|GLOBAL] 系统变量名 = 值`  
+`SET @@[SESSION|GLOBAL].系统变量名 = 值` 
+-- SQLBook: Code
+SHOW GLOBAL VARIABLES LIKE 'AUTO%';
+SELECT @@SESSION.autocommit;
+SET SESSION autocommit = 0;
+SET @@SESSION.autocommit = 1;
+-- SQLBook: Markup
+用户自定义变量  
+作用域为当前会话  
+赋值(推荐:=)  
+`SET @变量名 = 值`  
+`SET @变量名 := 值`  
+`SELECT @变量名 := 值`   
+-- SQLBook: Code
+SET @myname = 'WanChunhong';
+SET @myage := 19;
+SET @mygender := '男',@myheight := 1.75;
+SELECT COUNT(*) INTO @myemployee FROM emp;
+SELECT @myemployee;
+-- SQLBook: Markup
+局部变量  
+范围在`BEGIN`和`END`之间  
+赋值  
+`SET 变量名 = 值`  
+声明  
+`DECLARE 变量名 变量类型[DEFAULT ...];`
+-- SQLBook: Code
+CREATE PROCEDURE p2()
+BEGIN
+    DECLARE emp_count INT DEFAULT 0;
+    SET emp_count := 110;
+    SELECT COUNT(*) INTO emp_count FROM emp;
+    SELECT emp_count;
+    SELECT * FROM emp;
+END;
+DROP PROCEDURE p2;
+CALL p2;
+-- SQLBook: Markup
+IF 条件判断  
+```
+IF 条件1 THEN    
+    ...  
+ELSEIF 条件2 THEN  
+    ...  
+ELSE 条件3 THEN  
+    ...  
+END IF;
+```
+-- SQLBook: Code
+SELECT * FROM emp;
+DELIMITER //
+CREATE PROCEDURE p3()
+BEGIN
+    DECLARE salary_rank VARCHAR(20) DEFAULT 'N';
+    DECLARE salary INT DEFAULT 0;
+    IF salary >= 5000 THEN
+        SET salary_rank := 'A';
+    ELSEIF salary >= 4000 THEN
+        SET salary_rank := 'B';
+    ELSE
+        SET salary_rank := 'C';
+    END IF;
+    SELECT salary_rank;
+END//
+DELIMITER ;
+CALL p3();
+-- SQLBook: Markup
+参数(IN,OUT,INOUT)  
+IN 输入参数  
+OUT 输出参数  
+INOUT 输入输出参数  
+```
+CREATE PROCEDURE 存储过程名称(IN/OUT/INOUT 参数名 参数类型)  
+BEGIN  
+    SQL语句
+END;
+```
+-- SQLBook: Code
+DROP PROCEDURE p4;
+DELIMITER //
+CREATE PROCEDURE p4(IN salary INT,OUT salary_rank CHAR(1))
+BEGIN
+    IF salary >= 5000 THEN
+        SET salary_rank := 'A';
+    ELSEIF salary >=4000 THEN 
+        SET salary_rank := 'B';
+    ELSE
+        SET salary_rank := 'C';
+    END IF;
+END//
+DELIMITER ;
+CALL p4(5600,@salary_rank);
+SELECT @salary_rank;
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE turn(INOUT score DOUBLE)
+BEGIN
+    SET score := score * 0.5;
+END//
+DELIMITER ;
+SET @score := 198;
+CALL turn(@score);
+SELECT @score;

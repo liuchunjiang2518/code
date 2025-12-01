@@ -1,0 +1,130 @@
+-- SQLBook: Code
+CREATE DATABASE IF NOT EXISTS CompanyInfo;
+USE CompanyInfo;
+
+CREATE TABLE Department(
+    d_id INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '部门号',
+    d_name VARCHAR(20) UNIQUE NOT NULL COMMENT '部门名称',
+    `function` VARCHAR(20) COMMENT '部门职能',
+    address VARCHAR(30) COMMENT '工作地点'
+);
+
+CREATE TABLE employee(
+    id INT UNIQUE NOT NULL AUTO_INCREMENT COMMENT '员工号',
+    name VARCHAR(20) NOT NULL COMMENT '姓名',
+    sex ENUM('男','女') NOT NULL COMMENT '性别',
+    age INT COMMENT '年龄',
+    d_id INT NOT NULL COMMENT '部门号',
+    salary FLOAT COMMENT '工资',
+    Card VARCHAR(18) UNIQUE COMMENT '身份证号',
+    address VARCHAR(50) COMMENT '家庭住址',
+    FOREIGN KEY(d_id) REFERENCES Department(d_id)
+);
+
+INSERT INTO Department(d_name,`function`,address) VALUES
+    ('人事部', '人力资源', 'A栋101'),
+    ('财务部', '财务管理', 'A栋201'),
+    ('技术部', '技术开发', 'B栋301'),
+    ('市场部', '市场推广', 'C栋101'),
+    ('行政部', '行政管理', 'A栋301');
+
+INSERT INTO employee (name, sex, age, d_id, salary, Card, address) VALUES
+    ('张三', '男', 25, 1, 6000, '110101199001011234', '北京市朝阳区'),
+    ('李四', '女', 22, 2, 5500, '110101199002021235', '上海市浦东新区'),
+    ('王五', '男', 19, 3, 7000, '110101199003031236', '北京市海淀区'),
+    ('赵六', '女', 28, 4, 6500, '110101199004041237', '广州市天河区'),
+    ('孙七', '男', 21, 5, 5000, '110101199005051238', '北京市西城区'),
+    ('周八', '女', 18, 1, 4800, '110101199006061239', '深圳市福田区'),
+    ('吴九', '男', 30, 2, 8000, '110101199007071240', '北京市东城区');
+
+-- (1) 在Department表中以d_name字段创建名为index_dname的索引
+CREATE INDEX index_name ON Department(d_name);
+-- (2) 在employee表中以name字段创建名为index_name的索引，再以name字段前2字符创建名为index_name2的索引。分别使用索引名index_name和index_name2查询数据。
+CREATE INDEX index_name ON employee(name);
+CREATE INDEX index_name2 ON employee(name(2));
+SELECT * FROM employee USE INDEX(index_name) WHERE NAME = '张三';
+SELECT * FROM employee USE INDEX(index_name2) WHERE name LIKE '张%';
+-- (3) 在employee表中以name字段创建名为fullindex_name的全文索引。
+ALTER TABLE employee ADD FULLTEXT INDEX fullindex_name(name);
+-- (4) 在employee表中以age和address字段创建名为index_ageaddress的多列索引
+CREATE INDEX index_ageaddress ON employee(age,address);
+-- (5) 用 ALTER TABLE 语句在employee表中以id字段创建名为index_id的唯一性索引。
+ALTER TABLE employee ADD UNIQUE INDEX index_id(id);
+-- (6) 查看Department和employee表上的索引信息
+SHOW INDEX FROM Department;
+SHOW INDEX FROM employee;
+-- (7) 删除 Department表上的index_dname 索引。
+DROP INDEX index_name ON Department;
+-- (8) 删除employee表上的index_name索引
+DROP INDEX index_name ON employee;
+-- (1) 创建视图employee_view，包含年龄大于20岁的人员id,NAME,sex,address信息。
+CREATE VIEW employee_view AS
+SELECT id,name,sex,address
+FROM employee
+WHERE age > 20;
+-- (2) 查看视图employee_view的基本结构和详细结构
+DESC employee_view;
+SHOW CREATE VIEW employee_view;
+-- (3) 查看视图employee_view的所有记录
+SELECT * FROM employee_view;
+-- (4) 修改视图employee_view，满足年龄小于20岁的人员id,NAME,sex,address信息
+DROP VIEW employee_view;
+CREATE VIEW employee_view AS
+SELECT id,name,sex,address
+FROM employee
+WHERE age < 20;
+-- (5) 更新视图，将id号为3的人员的性别由"男"改为"女"
+UPDATE employee_view SET sex = '女' WHERE id = 3;
+-- (6) 删除employee_view视图
+DROP VIEW employee_view;
+-- (7) 创建视图employee_view2，包含家庭在北京的人员id,NAME,sex,address,d_name信息
+CREATE VIEW employee_view2 AS
+SELECT e.id,e.name,e.sex,e.address,d.d_name
+FROM employee e
+JOIN department d
+ON d.d_id = e.d_id
+WHERE e.address LIKE '北京%';
+-- (8) 创建视图employee_view3，包含家庭在北京的人员信息，要求列名显示为中文
+CREATE VIEW employee_view3 AS
+SELECT 
+    e.id AS 员工号,
+    e.name AS 姓名, 
+    e.sex AS 性别,
+    e.address AS 家庭住址,
+    d.d_name AS 部门名
+FROM employee e
+JOIN department d
+ON d.d_id = e.d_id
+WHERE e.address LIKE '北京%';
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@supermarket
+CREATE DATABASE IF NOT EXISTS supermarket;
+USE supermarket;
+
+CREATE TABLE Food(
+    Foodid INT UNIQUE NOT NULL PRIMARY KEY COMMENT '食品编号',
+    Name VARCHAR(20) NOT NULL COMMENT '食品名称',
+    Company VARCHAR(30) NOT NULL COMMENT '生产厂商',
+    Buying_price FLOAT NOT NULL COMMENT '进货价格',
+    Product_date DATE COMMENT '生产日期',
+    expiring_date DATE COMMENT '失效日期',
+    address VARCHAR(50) COMMENT '厂址' 
+);
+
+CREATE TABLE sales(
+    id INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '自增号',
+    foodid INT NOT NULL COMMENT '食品编号',
+    price FLOAT NOT NULL COMMENT '销售价',
+    amount INT NOT NULL COMMENT '销售数量',
+    sale_date DATETIME NOT NULL COMMENT '销售日期'
+);
+
+INSERT INTO Food VALUES
+    (1001,'QQ饼干','QQ饼干厂',12,'2020.12.12','2021.12.11','北京'),
+    (1002,'MN牛奶','MN牛奶厂',5.5,'2021.6.1','2022.5.31','河北'),
+    (1003,'EE果冻','EE果冻厂',4.5,'2021.6.7','2021.12.6','北京'),
+    (1004,'FF咖啡','FF咖啡厂',20,'2019.11.01','2021.10.31','天津'),
+    (1005,'GG奶糖','GG食品厂',15,'2018.10.29','2021.10.28','广东'),
+    (1006,'GG牛奶','GG食品厂',4.5,'2019.10.25','2021.10.24','广东');
+
+INSERT INTO sales VALUES

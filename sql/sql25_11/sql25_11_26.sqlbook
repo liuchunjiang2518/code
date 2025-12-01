@@ -7,12 +7,3 @@ SELECT * FROM tb_user;
 CREATE INDEX idx_email ON tb_user(email);
 DROP INDEX idx_email ON tb_user;
 SHOW GLOBAL STATUS LIKE 'Com_______';
--- SQLBook: Code
--- Active: 1762253198320@@127.0.0.1@3306@companyinfo
-CREATE DATABASE CompanyInfo;
-CREATE TABLE Department(
-    d_id INT UNIQUE NOT NULL PRIMARY KEY COMMENT '部门号',
-    d_name VARCHAR(20) UNIQUE COMMENT '部门名称',
-    `function` VARCHAR(20) COMMENT '部门职能',
-    address VARCHAR(30) COMMENT '工作地点'
-);
