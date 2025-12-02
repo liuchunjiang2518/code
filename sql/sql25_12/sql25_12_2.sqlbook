@@ -3,14 +3,14 @@
 ```
 CREATE PROCEDURE 存储过程名称([参数列表])  
 BEGIN  
-    SQL语句  
+    ...  
 END
 ```
 删除存储过程  
 `DROP PROCEDURE 存储过程名称;`  
   
 查询数据库存储过程及其状态  
-`SELECT * FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA = 'xxx';`
+`SELECT * FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_SCHEMA = 'xxx';`  
 `SHOW CREATE 存储过程名称`
 -- SQLBook: Code
 CREATE PROCEDURE p1()
@@ -87,7 +87,7 @@ END;
 DROP PROCEDURE p2;
 CALL p2;
 -- SQLBook: Markup
-IF 条件判断  
+`IF` 条件判断  
 ```
 IF 条件1 THEN    
     ...  
@@ -117,13 +117,13 @@ DELIMITER ;
 CALL p3();
 -- SQLBook: Markup
 参数(IN,OUT,INOUT)  
-IN 输入参数  
-OUT 输出参数  
-INOUT 输入输出参数  
+`IN` 输入参数  
+`OUT` 输出参数  
+`INOUT` 输入输出参数  
 ```
 CREATE PROCEDURE 存储过程名称(IN/OUT/INOUT 参数名 参数类型)  
 BEGIN  
-    SQL语句
+    ...
 END;
 ```
 -- SQLBook: Code
@@ -152,3 +152,224 @@ DELIMITER ;
 SET @score := 198;
 CALL turn(@score);
 SELECT @score;
+-- SQLBook: Markup
+`CASE` 条件判断  
+```
+CASE  
+    WHEN 条件1 THEN  
+        ...
+    WHEN 条件2 THEN
+        ...
+END CASE;
+```
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE p5(IN month INT)
+BEGIN
+    DECLARE quarter CHAR(4);
+    CASE
+        WHEN month >= 1 AND month <= 3 THEN
+            SET quarter := '第一季度';
+        WHEN month >= 4 AND month <= 6 THEN
+            SET quarter := '第二季度';
+        WHEN month >= 7 AND month <= 9 THEN
+            SET quarter := '第三季度';
+        WHEN month >= 10 AND month <= 12 THEN
+            SET quarter := '第四季度';
+        ELSE
+            SET quarter := '非法参数';
+    END CASE;
+    SELECT CONCAT('月份为：',month,'，季度为：',quarter);
+END//
+DELIMITER ;
+CALL p5(3);
+DROP PROCEDURE p5;
+-- SQLBook: Markup
+`WHILE` 条件循环
+```
+WHILE 循环条件 DO
+    ...
+END WHILE;
+```
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE p6(IN num INT)
+BEGIN
+    DECLARE res INT DEFAULT 0;
+    WHILE num DO
+        SET res := res + num;
+        SET num := num - 1;
+    END WHILE;
+    SELECT res;
+END//
+DELIMITER ;
+DROP PROCEDURE p6;
+CALL p6(10);
+-- SQLBook: Markup
+`repeat` 条件循环  
+满足条件退出循环  
+```
+REPEAT
+    ...
+    UNTIL 退出循环条件
+END REPEAT;
+```
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE p7(IN num INT)
+BEGIN
+    DECLARE res INT DEFAULT 0;
+    REPEAT
+        SET res := res + num;
+        SET num := num - 1;
+        UNTIL num <= 0
+    END REPEAT;
+    SELECT res;
+END//
+DELIMITER ;
+DROP PROCEDURE p7;
+CALL p7(10);
+-- SQLBook: Markup
+`LOOP`  循环
+```
+循环名:LOOP  
+    ...
+END LOOP 循环名;
+
+```
+`LEAVE 循环名`  
+退出循环[类似`break`]
+  
+`ITERATE 循环名`  
+跳过当前循环剩余语句直接进入下一次循环[类似`continue`]
+
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE func(IN num INT)
+BEGIN
+    DECLARE res INT DEFAULT 0;
+    sum:LOOP
+        IF num <= 0 THEN 
+            LEAVE sum;
+        END IF;
+        IF num % 2 = 1 THEN 
+            SET num := num - 1;
+            ITERATE sum;
+        END IF;
+        SET res := res + num;
+        SET num := num - 1;
+    END LOOP sum;
+    SELECT res;
+END//
+DELIMITER ;
+CALL func(7);
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE p8(IN num INT)
+BEGIN
+    DECLARE res INT DEFAULT 0;
+    sum:LOOP
+        IF num <= 0 THEN
+            LEAVE sum;
+        END IF;
+        SET res := res + num;
+        SET num := num - 1;
+    END LOOP sum;
+    SELECT res;
+END//
+DELIMITER ;  
+CALL p8(10)  
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE p9(IN num INT)
+BEGIN
+    DECLARE res INT DEFAULT 0;
+    sum:LOOP
+        IF num <= 0 THEN
+            LEAVE sum;
+        END IF;
+        IF num % 2 = 0 THEN
+            SET res := res + num;
+            SET num := num - 2;
+        ELSE
+            SET num := num - 1;
+        END IF;
+    END LOOP sum;
+    SELECT res;
+END//
+DELIMITER ;
+CALL p9(6)
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE p10(IN num INT)
+BEGIN
+    DECLARE res INT DEFAULT 0;
+    IF num % 2 = 1 THEN
+        SET num := num - 1;
+    END IF;
+    sum:LOOP
+        IF num <= 2 THEN
+            LEAVE sum;
+        END IF;
+        SET res := res + num;
+        SET num := num - 2;
+    END LOOP sum;
+    SELECT res;
+END//
+DELIMITER ;
+CALL p10(7);
+DROP PROCEDURE p10;
+-- SQLBook: Markup
+游标[`CURSOR`]  
+用来存储查询结果集的数据类型  
+  
+声明游标  
+`DECLARE 游标名称 CURSOR FOR 查询语句;`  
+  
+打开游标  
+`OPEN 游标名称;`
+  
+获取游标记录  
+`FETCH 游标名称 INTO 变量1[,变量2];`
+  
+关闭游标  
+`CLOSE 游标名称;`  
+-- SQLBook: Markup
+条件处理程序  
+`DECLARE 处理程序动作[CONTINUE,EXIT] HANDLER FOR 条件值 ...;`  
+  
+处理程序动作  
+`CONTINUE`  
+继续执行当前程序  
+`EXIT`  
+终止当前程序  
+
+条件值  
+状态码  
+如`SQLSTATE '02000'`   
+`SQLWARING` 01开头  
+`NOT FOUND` 02开头  
+`SQLEXCEPTION` 除此以外  
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE p11(IN u_age INT)
+BEGIN
+    DECLARE u_name VARCHAR(20);
+    DECLARE u_d_id CHAR(3);
+    DECLARE u_cursor CURSOR FOR SELECT name,d_id FROM emp WHERE age < u_age;
+    DECLARE EXIT HANDLER FOR NOT FOUND CLOSE u_cursor;
+    CREATE TABLE IF NOT EXISTS emp_d_id(
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(20),
+        d_id CHAR(3) 
+    );
+    OPEN u_cursor;
+    WHILE TRUE DO
+        FETCH u_cursor INTO u_name,u_d_id;
+        INSERT INTO emp_d_id(name,d_id) VALUES
+            (u_name,u_d_id);
+    END WHILE;
+    CLOSE u_cursor;
+END//
+DELIMITER ;
+CALL p11(40);

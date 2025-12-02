@@ -127,4 +127,66 @@ INSERT INTO Food VALUES
     (1005,'GG奶糖','GG食品厂',15,'2018.10.29','2021.10.28','广东'),
     (1006,'GG牛奶','GG食品厂',4.5,'2019.10.25','2021.10.24','广东');
 
-INSERT INTO sales VALUES
+INSERT INTO sales(foodid,price,amount,sale_date) VALUES
+    (1001, 15.5, 10, '2023-11-01 09:30:00'),
+    (1002, 7.0, 5, '2023-11-01 10:15:00'),
+    (1003, 6.0, 8, '2023-11-01 11:20:00'),
+    (1001, 15.5, 3, '2023-11-01 14:45:00'),
+    (1004, 25.0, 2, '2023-11-01 16:30:00'),
+    (1005, 18.0, 4, '2023-10-15 10:00:00'),
+    (1006, 6.0, 6, '2023-10-20 14:30:00'),
+    (1002, 7.0, 3, '2023-10-25 11:15:00'),
+    (1003, 6.0, 5, '2023-10-28 09:45:00'),
+    (1001, 15.5, 7, '2023-11-01 17:00:00'),
+    (1004, 25.0, 1, '2023-11-02 18:30:00'),
+    (1005, 18.0, 2, '2023-10-10 13:20:00');
+-- (1) 创建名为Ged_Company_food的存储过程。给出生产厂商，查询该生产厂商的食品编号、食品名称、进货价格、生产日期、失效日期。
+DELIMITER //
+CREATE PROCEDURE Ged_Company_food(IN company_name VARCHAR(30))
+BEGIN
+    SELECT 
+        Foodid,
+        Name,
+        Buying_price,
+        Product_date,
+        expiring_date 
+    FROM Food
+    WHERE Company = company_name;
+END//
+DELIMITER ;
+-- (2) 创建名为Get_Sales 的存储过程，查询当天超市的总销售额、当天每种食品的销售额（含食品编号、食品名称、销售金额）以及当月每种食品的销售额（含食品编号、食品名称、销售金额）。
+DELIMITER //
+CREATE PROCEDURE Get_Sales(IN today DATE)
+BEGIN
+    SELECT 
+        '当天总销售额' AS description,
+        SUM(price * amount) AS total_sales
+    FROM sales
+    WHERE DATE(sale_date) = today;
+    SELECT 
+        f.Foodid,
+        f.Name,
+        SUM(s.price * s.amount) as daily_sales
+    FROM Food f
+    JOIN sales s
+    ON s.foodid = f.`Foodid`
+    WHERE DATE(s.sale_date) = today
+    GROUP BY f.`Foodid`,f.`Name`;
+    SELECT
+        f.Foodid,
+        f.Name,
+        SUM(s.price * s.amount) as monthly_sales
+    FROM Food f
+    JOIN sales s
+    ON f.`Foodid` = s.foodid
+    WHERE 
+        MONTH(s.sale_date) = MONTH(today)
+        AND YEAR(s.sale_date) = YEAR(today)
+    GROUP BY f.`Foodid`;
+END//
+DELIMITER ;
+-- (3) 创建名为Pfood_price_count的存储过程。查询食品进货价格在price_infol和price_info2之间的未过期的食品数量count和平均单价avgprice。要求：食品数量(count)用out参数返回，平均单价用用户变量@avgprice来返回，求解过程采用游标方式
+DELIMITER //
+CREATE PROCEDURE Pfood_price_count(IN price_info1 FLOAT,IN price_info2 FLOAT,OUT count INT)
+BEGIN
+    
