@@ -1,4 +1,5 @@
 -- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@companyinfo
 CREATE DATABASE CompanyInfo;
 USE CompanyInfo;
 
@@ -61,3 +62,24 @@ SELECT * FROM operate;
 SHOW TRIGGERS;
 -- 5．删除Tproduct_af_update触发器。
 DROP TRIGGER Tproduct_af_update;
+-- 6. 创建一个事件event1，每隔1分钟自动向operate表插入一条信息操作类别为“事件触发”，操作描述为“事件监测”, 操作用户和操作时间通过系统函数获取。
+SET GLOBAL event_scheduler = ON;
+DELIMITER //
+CREATE EVENT event1
+ON SCHEDULE EVERY 1 MINUTE 
+STARTS CURRENT_TIMESTAMP
+DO 
+BEGIN 
+    INSERT INTO operate(op_name,op_time,op_user) VALUES
+        ('事件监测',NOW(),USER());
+END//
+DELIMITER ;
+-- 7. 分别设置事件为关闭和活动状态，查阅operate表记录信息变化情况。
+ALTER EVENT event1 DISABLE;
+SELECT * FROM operate;
+ALTER EVENT event1 ENABLE;
+SELECT * FROM operate;
+-- 8. 查看数据库中事件及event1定义信息。
+SHOW CREATE EVENT event1;
+-- 9. 删除事件event1。
+DROP EVENT event1;
