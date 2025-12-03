@@ -187,6 +187,39 @@ END//
 DELIMITER ;
 -- (3) 创建名为Pfood_price_count的存储过程。查询食品进货价格在price_infol和price_info2之间的未过期的食品数量count和平均单价avgprice。要求：食品数量(count)用out参数返回，平均单价用用户变量@avgprice来返回，求解过程采用游标方式
 DELIMITER //
-CREATE PROCEDURE Pfood_price_count(IN price_info1 FLOAT,IN price_info2 FLOAT,OUT count INT)
+CREATE PROCEDURE Pfood_price_count(IN price_info1 FLOAT,IN price_info2 FLOAT,IN today DATE,OUT count INT)
 BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE food_count INT DEFAULT 0;
+    DECLARE total_price FLOAT DEFAULT 0;
+    DECLARE current_price FLOAT;
+    DECLARE food_cursor CURSOR FOR
+        SELECT Buying_price
+        FROM Food
+        WHERE Buying_price BETWEEN price_info1 AND price_info2
+            AND expiring_date >= today;
     
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    
+    SET count = 0;
+    SET total_price = 0;
+    
+    OPEN food_cursor;
+    
+    read_loop: LOOP
+        FETCH food_cursor INTO current_price;
+        IF done = 1 THEN
+            LEAVE read_loop;
+        END IF;
+        SET food_count = food_count + 1;
+        SET total_price = total_price + current_price;
+    END LOOP;
+    CLOSE food_cursor;
+    SET `count` = food_count;
+    IF food_count > 0 THEN
+        SET @avgprice = total_price / food_count;
+    ELSE
+        SET @avgprice = 0;
+    END IF;
+END//
+DELIMITER ;

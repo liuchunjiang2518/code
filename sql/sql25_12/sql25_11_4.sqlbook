@@ -1,0 +1,63 @@
+-- SQLBook: Code
+CREATE DATABASE CompanyInfo;
+USE CompanyInfo;
+
+CREATE TABLE product(
+    id INT UNIQUE NOT NULL PRIMARY KEY COMMENT '产品编号',
+    NAME VARCHAR(20) NOT NULL COMMENT '产品名称',
+    `function` VARCHAR(50) COMMENT '产品功能',
+    company VARCHAR(20) NOT NULL COMMENT '生产厂商', 
+    address VARCHAR(50) COMMENT '厂商地址'
+);
+
+CREATE TABLE operate(
+    op_id INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '自动编号',
+    op_name VARCHAR(20) NOT NULL COMMENT '操作类型',
+    op_time DATETIME NOT NULL COMMENT '操作时间',
+    op_desc VARCHAR(200) COMMENT '操作描述',
+    op_user VARCHAR(50) NOT NULL COMMENT '操作用户'
+);
+
+-- 1．在product表上分别创建BEFORE INSERT、AFTER UPDATE和AFTER DELETE 3个触发器，触发器的名称分别为Tproduct_bf_insert、Tproduct_af_update和Tproduct_af_del。执行语句部分都是向operate表插入操作类别（INSERT、UPDATE、DELETE）、操作时间、操作用户及操作描述（如：新增某地的某某公司生产某某产品等）。
+-- (1) 创建Tproduct_bf_insert触发器。
+DELIMITER //
+CREATE TRIGGER Tproduct_bf_insert
+BEFORE INSERT ON product FOR EACH ROW
+BEGIN
+    INSERT INTO operate VALUES
+        (NULL,'INSERT',NOW(),CONCAT('新增',NEW.address,NEW.company,'生产的',NEW.NAME),USER());
+END//
+DELIMITER ;
+-- (2) 创建Tproduct_af_update触发器。
+DELIMITER //
+CREATE TRIGGER Tproduct_af_update
+AFTER UPDATE ON product FOR EACH ROW
+BEGIN
+    INSERT INTO operate VALUES
+        (NULL,'UPDATE',NOW(),CONCAT('厂商从',OLD.address,'更新为',NEW.address,'地址从',OLD.company,'更新为',NEW.company,'巴拉巴拉'),USER());
+END//
+DELIMITER ;
+-- (3) 创建Tproduct_af_del触发器。
+DELIMITER //
+CREATE TRIGGER Tproduct_af_del
+AFTER DELETE ON product FOR EACH ROW
+BEGIN
+    INSERT INTO operate VALUES
+        (NULL,'DELETE',NOW(),CONCAT('删除',OLD.address,OLD.company,'生产的',OLD.NAME),USER());
+END//
+DELIMITER ;
+-- 2．对product表执行INSERT、UPDATE和DELETE操作。
+-- (1) 对product表中插入一条记录，
+-- 如：1,'感冒清','治疗感冒', '北京abc制药厂','北京市昌平区'
+INSERT INTO product VALUES
+    (1,'感冒清','治疗感冒', '北京abc制药厂','北京市昌平区');
+-- (2) 更新记录，将产品编号为1的厂商住址：改为“北京市海淀区”。
+UPDATE product SET address = '北京市海淀区' WHERE id = 1;
+-- (3) 删除产品编号为1的记录。
+DELETE FROM product WHERE id = 1;
+-- 3. 执行不同操作时，分别查阅operate 表中数据情况。
+SELECT * FROM operate;
+-- 4. 查看数据库中触发器及Tproduct_af_update触发器定义信息。
+SHOW TRIGGERS;
+-- 5．删除Tproduct_af_update触发器。
+DROP TRIGGER Tproduct_af_update;

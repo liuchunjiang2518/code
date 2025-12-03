@@ -1,0 +1,143 @@
+-- SQLBook: Markup
+存储函数  
+有返回值的存储过程，参数只能是`IN`类型(可以省略)  
+```
+CREATE FUNCTION 存储函数名([参数列表])
+RETURNS TYPE [charcteristic...]
+BEGIN
+    ...
+    RETURN ...
+END; 
+```
+  
+`DETERMINISTIC`  
+相同输入参数总是产生相同结果  
+`NO SQL`  
+不包含SQL语句  
+`READS SQL DATA`  
+包含读取数据的语句，但不包含写入数据的语句
+
+-- SQLBook: Code
+DELIMITER //
+CREATE FUNCTION func1(num INT)
+RETURNS INT DETERMINISTIC
+BEGIN
+    DECLARE res INT DEFAULT 0;
+    WHILE num >= 0 DO 
+        SET res := res + num;
+        SET num := num - 1;
+    END WHILE;
+    RETURN res;
+END//
+DELIMITER ;
+SELECT func1(10);
+-- SQLBook: Code
+CREATE TABLE user_logs(
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    operation VARCHAR(20) NOT NULL COMMENT '操作类型, insert/update/delete',
+    operate_time DATETIME NOT NULL COMMENT '操作时间',
+    operate_id INT(11) NOT NULL COMMENT '操作的ID',
+    operate_params VARCHAR(500) COMMENT '操作参数',
+    PRIMARY KEY(`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- SQLBook: Markup
+触发器   
+创建`TRIGGER`
+```
+CREATE TRIGGER 触发器名称  
+BEFORE/AFTER INSERT/UPDATE/DELETE  
+ON 表名 FOR EACH ROW --行级触发器  
+BEGIN  
+    ...
+END;
+```
+删除TRIGGER  
+`DROP TRIGGER 触发器名称;`
+-- SQLBook: Markup
+触发器1 插入
+-- SQLBook: Code
+DELIMITER //
+CREATE TRIGGER tb_user_inser_trigger
+AFTER INSERT ON tb_user FOR EACH ROW
+BEGIN
+    INSERT INTO user_logs(operation,operate_time,operate_id,operate_params) VALUES
+        ('INSERT',NOW(),NEW.id,CONCAT('插入的数据内容:',NEW.id,',',NEW.name,',',NEW.phone,',',NEW.email,',',NEW.profession));
+END//
+DELIMITER ;
+INSERT INTO tb_user VALUES
+    (NULL,'张yiyi', '13800138100', 'zhangsan@example.com', '程序员', 28, '男', 0, '2001-05-10 09:30:00');
+SELECT * FROM user_logs; 
+-- SQLBook: Markup
+触发器2 修改
+-- SQLBook: Code
+DELIMITER //
+CREATE TRIGGER tb_user_update_trigger
+AFTER UPDATE ON tb_user FOR EACH ROW
+BEGIN
+    INSERT INTO user_logs(operation,operate_time,operate_id,operate_params) VALUES 
+        (
+            'UPDATE',
+            NOW(),
+            NEW.id,
+            CONCAT(
+                '更新前的数据内容:',OLD.id,',',OLD.name,',',OLD.phone,',',OLD.email,',',OLD.profession,
+                '更新后的数据内容:',NEW.id,',',NEW.name,',',NEW.phone,',',NEW.email,',',NEW.profession
+                )
+        );
+END//
+DELIMITER ;
+UPDATE tb_user SET age = 29 WHERE name = '张yiyi';
+SELECT * FROM user_logs;
+-- SQLBook: Markup
+触发器3 删除
+-- SQLBook: Code
+DELIMITER //
+CREATE TRIGGER tb_user_delete_trigger
+AFTER DELETE ON tb_user FOR EACH ROW
+BEGIN 
+    INSERT INTO user_logs(operation,operate_time,operate_id,operate_params) VALUES
+    (
+        'DELETE',
+        NOW(),
+        OLD.id,
+        CONCAT('删除的数据内容:',OLD.id,',',OLD.name,',',OLD.phone,',',OLD.email,',',OLD.profession)
+    );
+END//
+DELIMITER ;
+DELETE FROM tb_user WHERE name = '张yiyi';
+SELECT * FROM user_logs;
+-- SQLBook: Markup
+test  
+创建名为Pfood_price_count的存储过程。查询食品进货价格在price_infol和price_info2之间的未过期的食品数量count和平均单价avgprice。要求：食品数量(count)用out参数返回，平均单价用用户变量@avgprice来返回，求解过程采用游标方式。
+-- SQLBook: Code
+DELIMITER //
+CREATE PROCEDURE Pfood_price_count(IN price_info1 INT,IN price_info2 INT,IN today DATE,OUT count INT)
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE total_price FLOAT DEFAULT 0;
+    DECLARE food_count INT DEFAULT 0;
+    DECLARE temp_price FLOAT;
+    DECLARE food_cursor CURSOR FOR
+        SELECT Buying_price
+        FROM Food
+        WHERE `Buying_price` BETWEEN price_info1 AND price_info2
+            AND expiring_date >= today;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+    OPEN food_cursor;
+    read_loop:LOOP
+        FETCH food_cursor INTO temp_price;
+        IF DONE = 1 THEN 
+            LEAVE read_loop;
+        END IF;
+        SET food_count := food_count + 1;
+        SET total_price := total_price + temp_price;
+    END LOOP;
+    CLOSE food_cursor;
+    SET count = food_count;
+    IF count > 0 THEN 
+        SET @avgprice := total_price / count;
+    ELSE 
+        SET @avgprice := 0;
+    END IF;
+END//
+DELIMITER ;

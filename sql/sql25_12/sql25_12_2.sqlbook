@@ -206,7 +206,7 @@ DELIMITER ;
 DROP PROCEDURE p6;
 CALL p6(10);
 -- SQLBook: Markup
-`repeat` 条件循环  
+`REPEAT` 条件循环  
 满足条件退出循环  
 ```
 REPEAT
@@ -351,6 +351,7 @@ DROP PROCEDURE p10;
 `NOT FOUND` 02开头  
 `SQLEXCEPTION` 除此以外  
 -- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@mydatabase
 DELIMITER //
 CREATE PROCEDURE p11(IN u_age INT)
 BEGIN
