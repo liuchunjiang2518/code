@@ -1,0 +1,206 @@
+-- SQLBook: Code
+-- Active: 1762253198320@@127.0.0.1@3306@companyinfo
+CREATE DATABASE CompanyInfo;
+USE CompanyInfo;
+
+CREATE TABLE product(
+    id INT UNIQUE NOT NULL PRIMARY KEY COMMENT '产品编号',
+    NAME VARCHAR(20) NOT NULL COMMENT '产品名称',
+    `function` VARCHAR(50) COMMENT '产品功能',
+    company VARCHAR(20) NOT NULL COMMENT '生产厂商', 
+    address VARCHAR(50) COMMENT '厂商地址'
+);
+
+CREATE TABLE operate(
+    op_id INT UNIQUE NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '自动编号',
+    op_name VARCHAR(20) NOT NULL COMMENT '操作类型',
+    op_time DATETIME NOT NULL COMMENT '操作时间',
+    op_desc VARCHAR(200) COMMENT '操作描述',
+    op_user VARCHAR(50) NOT NULL COMMENT '操作用户'
+);
+
+-- 1．在product表上分别创建BEFORE INSERT、AFTER UPDATE和AFTER DELETE 3个触发器，触发器的名称分别为Tproduct_bf_insert、Tproduct_af_update和Tproduct_af_del。执行语句部分都是向operate表插入操作类别（INSERT、UPDATE、DELETE）、操作时间、操作用户及操作描述（如：新增某地的某某公司生产某某产品等）。
+-- (1) 创建Tproduct_bf_insert触发器。
+DELIMITER //
+CREATE TRIGGER Tproduct_bf_insert
+BEFORE INSERT ON product FOR EACH ROW
+BEGIN
+    INSERT INTO operate VALUES
+        (NULL,'INSERT',NOW(),CONCAT('新增',NEW.address,NEW.company,'生产的',NEW.NAME),USER());
+END//
+DELIMITER ;
+-- (2) 创建Tproduct_af_update触发器。
+DELIMITER //
+CREATE TRIGGER Tproduct_af_update
+AFTER UPDATE ON product FOR EACH ROW
+BEGIN
+    INSERT INTO operate VALUES
+        (NULL,'UPDATE',NOW(),CONCAT('厂商从',OLD.address,'更新为',NEW.address,'地址从',OLD.company,'更新为',NEW.company,'巴拉巴拉'),USER());
+END//
+DELIMITER ;
+-- (3) 创建Tproduct_af_del触发器。
+DELIMITER //
+CREATE TRIGGER Tproduct_af_del
+AFTER DELETE ON product FOR EACH ROW
+BEGIN
+    INSERT INTO operate VALUES
+        (NULL,'DELETE',NOW(),CONCAT('删除',OLD.address,OLD.company,'生产的',OLD.NAME),USER());
+END//
+DELIMITER ;
+-- 2．对product表执行INSERT、UPDATE和DELETE操作。
+-- (1) 对product表中插入一条记录，
+-- 如：1,'感冒清','治疗感冒', '北京abc制药厂','北京市昌平区'
+INSERT INTO product VALUES
+    (1,'感冒清','治疗感冒', '北京abc制药厂','北京市昌平区');
+-- (2) 更新记录，将产品编号为1的厂商住址：改为“北京市海淀区”。
+UPDATE product SET address = '北京市海淀区' WHERE id = 1;
+-- (3) 删除产品编号为1的记录。
+DELETE FROM product WHERE id = 1;
+-- 3. 执行不同操作时，分别查阅operate 表中数据情况。
+SELECT * FROM operate;
+-- 4. 查看数据库中触发器及Tproduct_af_update触发器定义信息。
+SHOW TRIGGERS;
+-- 5．删除Tproduct_af_update触发器。
+DROP TRIGGER Tproduct_af_update;
+-- 6. 创建一个事件event1，每隔1分钟自动向operate表插入一条信息操作类别为“事件触发”，操作描述为“事件监测”, 操作用户和操作时间通过系统函数获取。
+SET GLOBAL event_scheduler = ON;
+DELIMITER //
+CREATE EVENT event1
+ON SCHEDULE EVERY 1 MINUTE 
+STARTS CURRENT_TIMESTAMP
+DO 
+BEGIN 
+    INSERT INTO operate(op_name,op_time,op_user) VALUES
+        ('事件监测',NOW(),USER());
+END//
+DELIMITER ;
+-- 7. 分别设置事件为关闭和活动状态，查阅operate表记录信息变化情况。
+ALTER EVENT event1 DISABLE;
+SELECT * FROM operate;
+ALTER EVENT event1 ENABLE;
+SELECT * FROM operate;
+-- 8. 查看数据库中事件及event1定义信息。
+SHOW CREATE EVENT event1;
+-- 9. 删除事件event1。
+DROP EVENT event1;
+-- SQLBook: Code
+-- Active: 1764811804156@@127.0.0.1@3306@companyinfo
+CREATE DATABASE db1;
+CREATE DATABASE db2;
+CREATE DATABASE JXGL;
+USE JXGL;
+
+CREATE TABLE student (
+    student_id VARCHAR(20) PRIMARY KEY COMMENT '学号',
+    name VARCHAR(50) NOT NULL COMMENT '姓名',
+    gender CHAR(1) COMMENT '性别',
+    birth_date DATE COMMENT '出生日期',
+    specialty_id VARCHAR(10) COMMENT '专业号',
+    class_id VARCHAR(20) COMMENT '班级编号',
+    FOREIGN KEY(specialty_id) REFERENCES specialty(specialty_id)
+) COMMENT '学生表';
+
+CREATE TABLE specialty (
+    specialty_id VARCHAR(10) PRIMARY KEY COMMENT '专业号',
+    specialty_name VARCHAR(100) NOT NULL COMMENT '专业名称',
+    discipline_category VARCHAR(50) COMMENT '学科门类',
+    country_code VARCHAR(10) COMMENT '国家编号'
+) COMMENT '专业表';
+
+CREATE TABLE course (
+    course_id VARCHAR(20) PRIMARY KEY COMMENT '课程号',
+    course_name VARCHAR(100) NOT NULL COMMENT '课程名称',
+    hours INT COMMENT '学时',
+    credits DECIMAL(3,1) COMMENT '学分',
+    college VARCHAR(100) COMMENT '开课学院'
+) COMMENT '课程表';
+
+CREATE TABLE sc (
+    student_id VARCHAR(20) COMMENT '学号',
+    course_id VARCHAR(20) COMMENT '课程号',
+    score DECIMAL(5,2) COMMENT '成绩',
+    PRIMARY KEY (student_id, course_id),
+    FOREIGN KEY (student_id) REFERENCES student(student_id),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
+) COMMENT '成绩表';
+
+INSERT INTO specialty VALUES 
+('CS001', '计算机科学', '工学', 'CN'),
+('MA001', '数学', '理学', 'CN');
+
+INSERT INTO student VALUES 
+('2023001', '张三', 'M', '2002-05-15', 'CS001', 'CS202301'),
+('2023002', '李四', 'F', '2003-02-20', 'MA001', 'MA202301');
+
+INSERT INTO course VALUES 
+('C001', '数据库系统', 64, 3.5, '计算机学院'),
+('C002', '高等数学', 96, 5.0, '理学院');
+
+INSERT INTO sc VALUES 
+('2023001', 'C001', 88.5),
+('2023002', 'C002', 92.0);
+
+USE db1;
+CREATE TABLE test1 (
+    id INT PRIMARY KEY COMMENT 'ID'
+) COMMENT '测试表1';
+
+USE db2;
+CREATE TABLE test2 (
+    id INT PRIMARY KEY COMMENT 'ID'
+) COMMENT '测试表2';
+
+INSERT INTO db1.test1 VALUES (1), (2), (3);
+INSERT INTO db2.test2 VALUES (1), (2), (3);
+
+-- (1) 使用root用户登录MySQL，创建Testuser1用户，初始密码设置为123456。
+CREATE USER 'Testuser1'@'localhost' IDENTIFIED BY '123456';
+-- (2) 使用root用户登录MySQL，创建Testuser2用户，该用户没有初始密码。
+CREATE USER 'Testuser2'@'localhost' IDENTIFIED BY '';
+-- (3) 用Testuser2用户登录，将其密码修改为000000。
+ALTER USER 'Testuser2'@'localhost' IDENTIFIED BY '000000';
+-- (4) 使用root用户登录MySQL，授予Testuser1用户所有权限。
+GRANT ALL PRIVILEGES ON *.* TO 'Testuser1'@'localhost';
+-- (5) 用Testuser1用户登录，为Testuser2用户设置CREATE和DROP权限。
+GRANT CREATE, DROP ON *.* TO 'Testuser2'@'localhost';
+FLUSH PRIVILEGES;
+-- (6) 用Testuser2用户登录，验证其拥有的CREATE和DROP权限。
+CREATE DATABASE test_db;
+DROP DATABASE test_db;
+SELECT * FROM JXGL.student;  -- 无SELECT权限
+INSERT INTO db1.test1 VALUES (4); -- 无INSERT权限
+-- (7) 用root用户登录，收回Testuser1用户和Testuser2用户的所有权限。
+REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'Testuser1'@'localhost';
+REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'Testuser2'@'localhost';
+FLUSH PRIVILEGES;
+-- (8) 删除Testuser1用户和Testuser2用户。
+DROP USER 'Testuser1'@'localhost';
+DROP USER 'Testuser2'@'localhost';
+-- (9) 修改root用户的密码为000000，以root用户登录系统，核实查看是否修改成功。
+ALTER USER 'root'@'localhost' IDENTIFIED BY '000000';
+-- (10) 使用root用户登录MySQL，创建Testuser3用户，登录主机IP地址为192.168.1.%，初始密码设置为123456。
+CREATE USER 'Testuser3'@'192.168.1.%' IDENTIFIED BY '123456';
+-- (11) 创建两个角色role1和role2，role1授予jxgl库的所有访问权限，role2授予jxgl库中学生表(student)的查询权限以及db1库的所有访问权限。
+CREATE ROLE role1;
+CREATE ROLE role2;
+GRANT ALL PRIVILEGES ON JXGL.* TO role1;
+GRANT SELECT ON JXGL.student TO role2;
+GRANT ALL PRIVILEGES ON db1.* TO role2;
+-- (12) 创建用户Te1、Te2和Te3,初始密码均为123456。Te1、Te3授予role角色1，T2授予role2。用Te1和Te2分别登录后，在jxgl库中查询学生表(select * from student;)和在db1库创建临时表（Test3(id int);）分析运行情况。
+CREATE USER 'Te1'@'localhost' IDENTIFIED BY '123456';
+CREATE USER 'Te2'@'localhost' IDENTIFIED BY '123456';
+CREATE USER 'Te3'@'localhost' IDENTIFIED BY '123456';
+GRANT role1 TO 'Te1'@'localhost', 'Te3'@'localhost';
+GRANT role2 TO 'Te2'@'localhost';
+USE JXGL;
+SELECT * FROM student;
+CREATE TABLE Test3(
+    id INT
+);
+-- (13) 删除角色role1和role2。
+DROP ROLE role1;
+DROP ROLE role2;
+
+DROP USER 'Te1'@'localhost';
+DROP USER 'Te2'@'localhost';
+DROP USER 'Te3'@'localhost';
