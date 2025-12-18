@@ -19,6 +19,52 @@ typedef struct Queue
     int rear;
 }Queue;
 
+void initGraphEdges(MatGraph* G)
+{
+    for(int i = 0;i < G->vertex_num;i++)
+    {
+        for(int j = 0;j < G->vertex_num;j++)
+        {
+            G->arc[i][j] = 0;
+        }
+    }
+    int edges[15][2] =
+    {
+        {0,1}, {0,5},
+        {1,2}, {1,6}, {1,8},
+        {2,3}, {2,8},
+        {3,4}, {3,6}, {3,7}, {3,8},
+        {4,5}, {4,7},
+        {5,6},
+        {6,7}
+    };
+    for(int i = 0;i < 15;i++)
+    {
+        int u = edges[i][0];
+        int v = edges[i][1];
+        G->arc[u][v] = 1;
+        G->arc[v][u] = 1;
+    }
+}
+
+void initGraphVertexs(MatGraph* G)
+{
+    for(int i = 0;i < G->vertex_num;i++)
+    {
+        G->vertex[i] = 'A' + i;
+    }
+}
+
+MatGraph* createGraph()
+{
+    MatGraph* G = (MatGraph*)malloc(sizeof(MatGraph));
+    G->vertex_num = 9;
+    G->edge_num = 15;
+    initGraphVertexs(G);
+    initGraphEdges(G);
+    return G;
+}
+
 Queue* initQueue()
 {
     Queue* Q = (Queue*)malloc(sizeof(Queue));
@@ -29,7 +75,7 @@ Queue* initQueue()
 
 int enQueue(Queue* Q,int val)
 {
-    if((Q->rear + 1) % MAXSIZE == Q->front)
+    if(Q->front == (Q->rear + 1) % MAXSIZE)
     {
         return 1;
     }
@@ -40,72 +86,13 @@ int enQueue(Queue* Q,int val)
 
 int deQueue(Queue* Q,int* del)
 {
-    if(Q->rear == Q->front)
+    if(Q->front == Q->rear)
     {
         return 1;
     }
     *del = Q->data[Q->front];
     Q->front = (Q->front + 1) % MAXSIZE;
     return 0;
-}
-
-void testEdge(MatGraph* G)
-{
-    G->arc[0][1] = 1;
-    G->arc[0][5] = 1;
-    G->arc[1][2] = 1;
-    G->arc[1][6] = 1;
-    G->arc[1][8] = 1;
-    G->arc[2][3] = 1;
-    G->arc[2][8] = 1;
-    G->arc[3][4] = 1;
-    G->arc[3][6] = 1;
-    G->arc[3][7] = 1;
-    G->arc[3][8] = 1;
-    G->arc[4][5] = 1;
-    G->arc[4][7] = 1;
-    G->arc[5][6] = 1;
-    G->arc[6][7] = 1;
-}
-
-MatGraph* createGraph()
-{
-    MatGraph* G = (MatGraph*)malloc(sizeof(MatGraph));
-    G->vertex_num = 9;
-    G->edge_num = 15;
-    for(int i = 0;i < G->vertex_num;i++)
-    {
-        G->vertex[i] = 'A' + i;
-    }
-    for(int i = 0;i < G->vertex_num;i++)
-    {
-        for(int j = 0;j < G->vertex_num;j++)
-        {
-            G->arc[i][j] = 0;
-        }
-    }
-    testEdge(G);
-    for(int i = 0;i < G->vertex_num;i++)
-    {
-        for(int j = 0;j < G->vertex_num;j++)
-        {
-            G->arc[j][i] = G->arc[i][j];
-        }
-    }
-    return G;
-}
-
-void dfs(MatGraph* G,int i)
-{
-    visited[i] = 1;
-    printf("%c ",G->vertex[i]);
-    for(int j = 0;j < G->vertex_num;j++)
-    {
-        if(G->arc[i][j] == 1 && visited[j] == 0)
-        {
-            dfs(G,j);
-        }
-    }
 }
 
 void bfs(MatGraph* G,int i)
@@ -127,11 +114,12 @@ void bfs(MatGraph* G,int i)
             }
         }
     }
+
 }
 
 int main()
 {
-    MatGraph* G = createGraph();
-    dfs(G,0);
+    MatGraph* G =createGraph();
+    bfs(G,0);
     return 0;
 }
