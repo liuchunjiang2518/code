@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "graphic.h"
+#include "Graphic.h"
 using namespace std;
 
 double Circle::calculateZC()

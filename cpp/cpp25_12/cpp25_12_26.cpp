@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include "graphic.h"
+#include "Graphic.h"
 using std::cout;
 using std::endl;
 using std::string;
