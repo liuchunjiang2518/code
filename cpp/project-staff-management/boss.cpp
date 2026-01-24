@@ -1,0 +1,18 @@
+#include "boss.h"
+
+Boss::Boss(int s_ID, std::string s_Name, int s_DeptID) {
+    ID = s_ID;
+    Name = s_Name;
+    DeptID = s_DeptID;
+}
+
+void Boss::showInfo() {
+    std::cout << "职工编号：" << this->getID()
+              << "职工姓名：" << this->getName()
+              << "岗位名称：" << this->getDeptName()
+              << "岗位任务：管理公司" << std::endl; 
+}
+
+std::string Boss::getDeptName() {
+    return std::string("老板");
+}

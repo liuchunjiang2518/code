@@ -1,18 +1,14 @@
-public class Java25_11_22
-{
-    public static void main(String[] args)
-    {
+public class Java25_11_22 {
+    public static void main(String[] args) {
         System.out.println("Hello World");
         System.out.println(sum(1,2));
         test();
     }
     //方法
-    public static int sum(int x,int y)
-    {
+    public static int sum(int x,int y) {
         return x+y;
     }
-    public static void test()
-    {
+    public static void test() {
         char a='b';
         System.out.println(a);
     }
