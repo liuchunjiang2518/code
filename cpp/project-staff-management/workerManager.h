@@ -47,4 +47,6 @@ private:
     int isWorkerExist(int id);
 
     int isWorkerExist(std::string name);
+
+    void updateFileEmptyStatus();
 };

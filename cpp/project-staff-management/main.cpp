@@ -2,6 +2,7 @@
 #include "workerManager.h"
 
 int main() {
+    system("chcp 65001 >nul");
     WorkerManager wm;
     
     int choose = 0;
@@ -28,6 +29,10 @@ int main() {
                 wm.Search_Worker();
                 break;
             case 6:
+                wm.Sort_Workers();
+                break;
+            case 7:
+                wm.Clear_Worker();
                 break;
             default:
                 system("cls");

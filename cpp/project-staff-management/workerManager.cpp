@@ -1,9 +1,12 @@
 #include "workerManager.h"
+#include <iostream>
+#include <fstream>
+#include <cstdlib> // For system()
 
 WorkerManager::WorkerManager() {
     std::ifstream ifs;
     ifs.open(FILENAME, std::ios::in);
-    
+
     if (!ifs.is_open()) {
         this->workerSize = 0;
         this->workerArray = nullptr;
@@ -22,9 +25,13 @@ WorkerManager::WorkerManager() {
         return;
     }
 
+    ifs.seekg(0, std::ios::beg);
+
     this->workerSize = this->getWorkerNumber();
     this->workerArray = new Worker*[this->workerSize];
     this->init_WorkerArray();
+
+    this->isFileEmpty = (this->workerSize == 0);
 
     ifs.close();
 }
@@ -64,6 +71,7 @@ void WorkerManager::Insert_Worker() {
             for (int i = 0; i < this->workerSize; i++) {
                 newSpace[i] = workerArray[i];
             }
+            delete[] this->workerArray; // Clean up old array after copying
         }
 
         for (int i = 0; i < num; i++) {
@@ -79,7 +87,7 @@ void WorkerManager::Insert_Worker() {
             std::cout << "1.employee" << std::endl;
             std::cout << "2.manager" << std::endl;
             std::cout << "3.boss" << std::endl;
-            std::cin >>deptID;
+            std::cin >> deptID;
 
             Worker* worker = nullptr;
             switch(deptID) {
@@ -93,17 +101,21 @@ void WorkerManager::Insert_Worker() {
                     worker = new Boss(id, name, deptID);
                     break;
                 default:
-                    break;
+                    std::cout << "无效的部门ID，跳过此员工。" << std::endl;
+                    continue;
             }
-
-            newSpace[this->workerSize + i] = worker;
+             if(worker != nullptr) {
+                 newSpace[this->workerSize + i] = worker;
+             } else {
+                 std::cout << "创建员工失败，跳过此员工。" << std::endl;
+                 continue;
+             }
         }
 
-        delete[] this->workerArray;
         this->workerArray = newSpace;
         this->workerSize = newSize;
 
-        this->save();
+        this->updateFileEmptyStatus();
         std::cout << "成功添加" << num << "个新员工" << std::endl;
     } else {
         std::cout << "输入数据有误" << std::endl;
@@ -131,12 +143,15 @@ void WorkerManager::Delete_Worker() {
     std::cin >> id;
     int idx = this->isWorkerExist(id);
     if (idx != -1) {
-        for (int i = idx; i < this->workerSize; i++) {
+        delete this->workerArray[idx];
+
+        for (int i = idx; i < this->workerSize - 1; i++) {
             this->workerArray[i] = this->workerArray[i + 1];
         }
-
+        this->workerArray[this->workerSize - 1] = nullptr;
         this->workerSize--;
-        this->save();
+
+        this->updateFileEmptyStatus();
         std::cout << "成功删除" << id << "号员工" << std::endl;
     } else {
         std::cout << "员工不存在" << std::endl;
@@ -174,12 +189,20 @@ void WorkerManager::Update_Worker() {
                 worker = new Boss(id, name, deptID);
                 break;
             default:
-                break;
+                std::cout << "无效的部门ID，更新失败。" << std::endl;
+                return;
         }
-        
-        this->workerArray[idx] = worker;
-        this->save();
-        std::cout << "成功更新" << id << "号员工" << std::endl;
+
+        if(worker != nullptr) {
+            delete this->workerArray[idx];
+            this->workerArray[idx] = worker;
+
+            this->save();
+
+            std::cout << "成功更新" << id << "号员工" << std::endl;
+        } else {
+             std::cout << "更新员工失败，未知错误。" << std::endl;
+        }
     } else {
         std::cout << "员工不存在" << std::endl;
     }
@@ -234,27 +257,29 @@ void WorkerManager::Sort_Workers() {
         std::cout << "2.DESC" << std::endl;
         int choose;
         std::cin >> choose;
- 
+
         if (choose == 1 || choose == 2) {
-            for (int i = 0; i < this->workerSize; i++) {
-                int idx = i;
-                for (int j = i + 1; j < this->workerSize; j++) {
-                    if (choose == 1) {
-                        if (this->workerArray[j] < this->workerArray[idx]) {
-                            idx = j;
-                        }
-                    } else {
-                        if (this->workerArray[j] > this->workerArray[idx]) {
-                            idx = j;
-                        }
-                    } 
-                }
-                if (i != idx) {
-                    Worker* temp = this->workerArray[i];
-                    this->workerArray[i] = this->workerArray[idx];
-                    this->workerArray[idx] = temp;
-                }
-            }           
+             for (int i = 0; i < this->workerSize - 1; i++) {
+                 int idx = i;
+                 for (int j = i + 1; j < this->workerSize; j++) {
+                     if (choose == 1) {
+                         if (this->workerArray[j]->getID() < this->workerArray[idx]->getID()) {
+                             idx = j;
+                         }
+                     } else {
+                         if (this->workerArray[j]->getID() > this->workerArray[idx]->getID()) {
+                             idx = j;
+                         }
+                     }
+                 }
+                 if (i != idx) {
+                     Worker* temp = this->workerArray[i];
+                     this->workerArray[i] = this->workerArray[idx];
+                     this->workerArray[idx] = temp;
+                 }
+             }
+             this->save();
+             std::cout << "排序完成。" << std::endl;
         } else {
             std::cout << "请输入正确的排序方式" << std::endl;
         }
@@ -271,20 +296,17 @@ void WorkerManager::Clear_Worker() {
     std::cin >> choose;
 
     if (choose == 1) {
-        std::ofstream ofs(FILENAME, std::ios::trunc);
-        ofs.close();
-
         if (this->workerArray != nullptr) {
             for (int i = 0; i < this->workerSize; i++) {
                 if (this->workerArray[i] != nullptr) {
                     delete this->workerArray[i];
                 }
             }
-            this->workerSize = 0;
             delete[] this->workerArray;
             this->workerArray = nullptr;
-            this->isFileEmpty = true;
         }
+        this->workerSize = 0;
+        this->updateFileEmptyStatus();
 
         std::cout << "清空成功" << std::endl;
     }
@@ -295,12 +317,29 @@ void WorkerManager::Clear_Worker() {
 void WorkerManager::save() {
     std::ofstream ofs;
     ofs.open(FILENAME, std::ios::out);
-    for (int i = 0; i < this->workerSize; i++) {
-        ofs << this->workerArray[i]->getID() << " "
-            << this->workerArray[i]->getName() << " "
-            << this->workerArray[i]->getDeptName() << std::endl;
+    if(ofs.is_open()){
+        for (int i = 0; i < this->workerSize; i++) {
+            if(this->workerArray[i] != nullptr){
+                ofs << this->workerArray[i]->getID() << " "
+                    << this->workerArray[i]->getName() << " "
+                    << this->workerArray[i]->getDeptID() << std::endl;
+            }
+        }
+        ofs.close();
+    } else {
+        std::cerr << "Error: Could not open file " << FILENAME << " for writing." << std::endl;
     }
-    ofs.close();
+}
+
+void WorkerManager::updateFileEmptyStatus() {
+    if (this->workerSize <= 0) {
+        std::ofstream ofs(FILENAME, std::ios::trunc);
+        ofs.close();
+        this->isFileEmpty = true;
+    } else {
+        this->save();
+        this->isFileEmpty = false;
+    }
 }
 
 int WorkerManager::getWorkerNumber() {
@@ -325,22 +364,27 @@ int WorkerManager::getWorkerNumber() {
 void WorkerManager::init_WorkerArray() {
     std::ifstream ifs;
     ifs.open(FILENAME, std::ios::in);
-    
+
     int id;
     std::string name;
     int deptID;
 
     int idx = 0;
-    while (ifs >> id && ifs >> name && ifs >> deptID) {
+    while (ifs >> id >> name >> deptID) {
         Worker* worker = nullptr;
         if (deptID == 1) {
             worker = new Employee(id, name, deptID);
         } else if (deptID == 2) {
             worker = new Manager(id, name, deptID);
-        } else {
+        } else if (deptID == 3) {
             worker = new Boss(id, name, deptID);
+        } else {
+            std::cerr << "Warning: Invalid department ID " << deptID << " found in file for employee " << id << ". Skipping." << std::endl;
+            continue;
         }
-        this->workerArray[idx++] = worker;
+        if(worker != nullptr){
+             this->workerArray[idx++] = worker;
+        }
     }
 
     ifs.close();
@@ -379,9 +423,6 @@ WorkerManager::~WorkerManager() {
                 delete this->workerArray[i];
             }
         }
-        this->workerSize = 0;
         delete[] this->workerArray;
-        this->workerArray = nullptr;
-        this->isFileEmpty = true;
     }
 }
