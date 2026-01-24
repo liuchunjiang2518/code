@@ -179,7 +179,7 @@ void WorkerManager::Update_Worker() {
         
         this->workerArray[idx] = worker;
         this->save();
-        std::cout << "成功删除" << id << "号员工" << std::endl;
+        std::cout << "成功更新" << id << "号员工" << std::endl;
     } else {
         std::cout << "员工不存在" << std::endl;
     }
@@ -234,11 +234,11 @@ void WorkerManager::Sort_Workers() {
         std::cout << "2.DESC" << std::endl;
         int choose;
         std::cin >> choose;
-
+ 
         if (choose == 1 || choose == 2) {
             for (int i = 0; i < this->workerSize; i++) {
                 int idx = i;
-                for (int j = 0; j < this->workerSize; j++) {
+                for (int j = i + 1; j < this->workerSize; j++) {
                     if (choose == 1) {
                         if (this->workerArray[j] < this->workerArray[idx]) {
                             idx = j;

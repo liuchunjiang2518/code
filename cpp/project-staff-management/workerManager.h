@@ -3,6 +3,9 @@
 #include <fstream>
 #define FILENAME "workerFile.txt"
 #include "worker.h"
+#include "employee.h"
+#include "manager.h"
+#include "boss.h"
 
 class WorkerManager {
 public:

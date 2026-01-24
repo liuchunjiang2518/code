@@ -1,9 +1,10 @@
 #pragma once
 #include <string>
 #include <iostream>
-#include "employee.h"
-#include "manager.h"
-#include "boss.h"
+
+class Employee;
+class Manager;
+class Boss;
 
 class Worker {
 public:
@@ -25,6 +26,7 @@ public:
     virtual void updateDeptID(int deptID) {
         this->DeptID = deptID;
     }
+    virtual ~Worker() = default;
 
 protected:
     int ID;
