@@ -101,7 +101,7 @@ void WorkerManager::Insert_Worker() {
                     worker = new Boss(id, name, deptID);
                     break;
                 default:
-                    std::cout << "无效的部门ID，跳过此员工。" << std::endl;
+                    std::cout << "无效的部门编号，跳过此员工。" << std::endl;
                     continue;
             }
              if(worker != nullptr) {
@@ -189,7 +189,7 @@ void WorkerManager::Update_Worker() {
                 worker = new Boss(id, name, deptID);
                 break;
             default:
-                std::cout << "无效的部门ID，更新失败。" << std::endl;
+                std::cout << "无效的部门编号，更新失败。" << std::endl;
                 return;
         }
 
