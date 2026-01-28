@@ -1,4 +1,4 @@
-public class Java26_1_24Friend {
+public class Friend {
     String name;
     int age;
     String gender;

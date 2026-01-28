@@ -1,6 +1,6 @@
 public class Java26_1_24 {
     private String name = "万春宏";
-    public static void main() {
+    public static void main(String[] args) {
         // test1();
         test2();
     }
@@ -14,7 +14,7 @@ public class Java26_1_24 {
         p.printHelloWorld();
         System.out.println(p.name);
 
-        Java26_1_24Friend f1 = new Java26_1_24Friend();
+        Friend f1 = new Friend();
         f1.sleep();
         f1.name = "万春宏";
         System.out.println(f1.name);

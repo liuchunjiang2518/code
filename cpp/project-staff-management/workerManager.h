@@ -40,7 +40,7 @@ private:
 
     void save();
 
-    int getWorkerNumber();
+    int getWorkerSize();
 
     void init_WorkerArray();
 

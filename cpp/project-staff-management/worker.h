@@ -20,10 +20,10 @@ public:
     virtual int getDeptID() const {
         return DeptID;
     }
-    virtual void updateName(std::string name) {
+    virtual void setName(std::string name) {
         this->Name = name;
     }
-    virtual void updateDeptID(int deptID) {
+    virtual void setDeptID(int deptID) {
         this->DeptID = deptID;
     }
     virtual ~Worker() = default;

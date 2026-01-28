@@ -1,7 +1,7 @@
 #include "workerManager.h"
 #include <iostream>
 #include <fstream>
-#include <cstdlib> // For system()
+#include <cstdlib>
 
 WorkerManager::WorkerManager() {
     std::ifstream ifs;
@@ -27,7 +27,7 @@ WorkerManager::WorkerManager() {
 
     ifs.seekg(0, std::ios::beg);
 
-    this->workerSize = this->getWorkerNumber();
+    this->workerSize = this->getWorkerSize();
     this->workerArray = new Worker*[this->workerSize];
     this->init_WorkerArray();
 
@@ -71,7 +71,7 @@ void WorkerManager::Insert_Worker() {
             for (int i = 0; i < this->workerSize; i++) {
                 newSpace[i] = workerArray[i];
             }
-            delete[] this->workerArray; // Clean up old array after copying
+            delete[] this->workerArray;
         }
 
         for (int i = 0; i < num; i++) {
@@ -342,7 +342,7 @@ void WorkerManager::updateFileEmptyStatus() {
     }
 }
 
-int WorkerManager::getWorkerNumber() {
+int WorkerManager::getWorkerSize() {
     std::ifstream ifs;
     ifs.open(FILENAME, std::ios::in);
 
